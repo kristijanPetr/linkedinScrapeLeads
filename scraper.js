@@ -5,7 +5,7 @@ const { postDataToAppsScript } = require("./index");
 function scrapeData(
   link = `https://www.bing.com/search?q=site%3alinkedin.com+intitle%3achiropractor+AND+owner+AND+texas&qs=n&first=0`,
   results = [],
-  count = 0
+  count = 2
 ) {
   scrapeIt(link, {
     // Fetch the articles
@@ -67,9 +67,10 @@ function scrapeData(
     console.log(countNextPage, oldCountNextPage);
     if (
       data.nextPage !== "" &&
-      parseInt(countNextPage) > parseInt(oldCountNextPage)
+      parseInt(countNextPage) > parseInt(oldCountNextPage) &&
+      count > 0
     ) {
-      scrapeData("https://www.bing.com" + data.nextPage, newData, count + 1);
+      scrapeData("https://www.bing.com" + data.nextPage, newData, count - 1);
     } else {
       console.log(results);
       postDataToAppsScript(results);

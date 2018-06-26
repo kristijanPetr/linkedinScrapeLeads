@@ -202,7 +202,7 @@ module.exports.postDataToAppsScript = data => {
   axios
     .post(
       "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
-      data
+      { linkedin: data }
     )
     .then(resp => {
       console.log(resp.data);
