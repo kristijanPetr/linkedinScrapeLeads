@@ -1,11 +1,11 @@
 const scrapeIt = require("scrape-it");
-const { postDataToAppsScript } = require("./index");
+const { postDataToAppsScript, testLocation } = require("./index");
 // Promise interface
 
 function scrapeData(
   link = `https://www.bing.com/search?q=site%3alinkedin.com+intitle%3achiropractor+AND+owner+AND+texas&qs=n&first=0`,
   results = [],
-  count = 2
+  count = 20
 ) {
   scrapeIt(link, {
     // Fetch the articles
@@ -51,7 +51,7 @@ function scrapeData(
       selector: ".sb_count",
       convert: x => (x.includes("Of") ? x.split("Of")[1] : x)
     }
-  }).then(({ data, response }) => {
+  }).then(async ({ data, response }) => {
     // console.log(`Status Code: ${response.statusCode}`);
 
     let newData = [...results, ...data.articles];
@@ -72,8 +72,9 @@ function scrapeData(
     ) {
       scrapeData("https://www.bing.com" + data.nextPage, newData, count - 1);
     } else {
-      console.log(results);
-      postDataToAppsScript(results);
+      // console.log(results[0]);
+      postDataToAppsScript(results, "linkedin");
+        testLocation(results);
       return results;
     }
   });

@@ -35,7 +35,7 @@ function getGooglePlaceInfo(query, param, keys) {
           if (keys.length === 1) {
             throw "All API keys currently over query limit. Add a new key or try again tomorrow.";
           } else {
-            return getLocation(query, keys.slice(1));
+            return getGooglePlaceInfo(query, param, keys.slice(1));
           }
         }
       }
@@ -130,7 +130,8 @@ function getComponent(components, type) {
 }
 
 function getGooglePlacesApiKeys() {
-  const googlePlacesApiKeys = "AIzaSyDFzy7tp6s06z9meoMP8T4b6Gh0fZoQVD8";
+  const googlePlacesApiKeys =
+    "AIzaSyDsjn_rG3XK8Eg-nvfTtx5we1eaUJEVvVU,AIzaSyDFzy7tp6s06z9meoMP8T4b6Gh0fZoQVD8";
   if (!googlePlacesApiKeys) {
     throw "No API keys provided." +
       "Go to File -> Project Properties -> Script Properties, then under ther property 'googlePlacesApiKeys'," +
@@ -140,71 +141,126 @@ function getGooglePlacesApiKeys() {
   }
 }
 
-async function testLocation(name) {
-  name = name || "Austin Reynolds";
-  let location = "Texas";
-  let vertical = "chiropractor";
+module.exports.testLocation = async linkedinData => {
+  let placesArr = [];
+  let emailLeads = [];
+  for (let i = 0; i < linkedinData.length; i++) {
+    let link = linkedinData[i];
+    //   await linkedinData.map(async link => {
+    let splitted = link.name
+      .replace("Dr.", "")
+      .trim()
+      .split(" ");
 
-  let placeData = await getGooglePlaceInfo(
-    "" + name + ", " + vertical + ", " + location + "",
-    "query",
-    getGooglePlacesApiKeys()
-  );
+    let filteredName = (splitted[0] + " " + splitted[1]).replace(
+      /[^\w\s]/gi,
+      ""
+    );
 
-  if (!placeData) return false;
+    let location = link.location;
+    let vertical = "chiropractor";
 
-  let placeIdInfo = await getGooglePlaceInfo(
-    placeData.placeId,
-    "placeid",
-    getGooglePlacesApiKeys()
-  );
+    let placeData = await getGooglePlaceInfo(
+      "" + filteredName + ", " + vertical + ", " + location + "",
+      "query",
+      getGooglePlacesApiKeys()
+    );
 
-  console.log(placeIdInfo);
-}
+    if (!placeData) continue;
 
-(async () => {
-  //testLocation();
-})().catch(err => {
-  console.error(err);
-});
+    let placeIdInfo = await getGooglePlaceInfo(
+      placeData.placeId,
+      "placeid",
+      getGooglePlacesApiKeys()
+    );
+    let { address, name, website = "", rating = "" } = placeIdInfo;
 
-function getEmailsFromDomain() {
-  let firstName = "Austin";
-  let lastName = "Reynolds";
-  let fullName = "Austin Reynolds";
-  let domain = "greenjayhealth.com";
+    placesArr.push([name, address, website, rating]);
 
-  //   let url =
-  //     "https://o/v2/email-finder?domain=" +
-  //     domain +
-  //     // "&first_name=" +
-  //     // firstName +
-  //     // "&last_name=" +
-  //     // lastName +
-  //     "&api_key=4847b3fd2f53da802f5346ac0268428dfcd19355";
-  let url = `https://api.hunter.io/v2/email-finder?domain=${domain}&first_name=${firstName}&last_name=${lastName}&api_key=4847b3fd2f53da802f5346ac0268428dfcd19355`;
+    let domain = domain_from_url(website);
+    // console.log(domain);
+    if (domain) {
+      //   console.log(name, website);
+      let emailResp = await getEmailsFromDomain({
+        fullName: name,
+        domain
+      });
+      if (emailResp && !emailResp.email) {
+        emailResp = await getEmailsFromDomain({
+          fullName: filteredName,
+          domain
+        });
+      }
+      emailLeads.push([name, filteredName, emailResp ?  emailResp.email : ""]);
+      //   console.log("EMAIL-->", emailResp.email);
+    }
+    //   });
+  }
+  console.log("PLACE INFO", placesArr);
+  await postDataToAppsScript(placesArr, "places");
+  await postDataToAppsScript(emailLeads, "emails");
+};
 
-  axios
+// testLocation();
+
+// (async () => {
+//   //
+// })().catch(err => {
+//   console.error(err);
+// });
+
+function getEmailsFromDomain(personData) {
+  //   let firstName = "Austin";
+  //   let lastName = "Reynolds";
+  //   let fullName = "Austin Reynolds";
+  //   let domain = "greenjayhealth.com";
+  let { fullName, domain } = personData;
+
+  let url = `https://api.hunter.io/v2/email-finder?domain=${domain}&full_name=${fullName}&api_key=4847b3fd2f53da802f5346ac0268428dfcd19355`;
+  //   console.log(url);
+  return axios
     .get(url)
     .then(response => {
       let { data } = response.data;
-      console.log(response.data.data);
-      postDataToAppsScript(data);
+      // console.log(response.data);
+      return data;
     })
-    .catch(err => console.log(err.data));
+    .catch(err => console.log(err));
 
   //writeToEmailSheet(emailData)
 }
 
 // getEmailsFromDomain();
 
-module.exports.postDataToAppsScript = data => {
-  axios
+const postDataToAppsScript = (data, name) => {
+  let objData = { [name]: data };
+  console.log("OBJECT DATA", objData);
+  return axios
     .post(
       "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
-      { linkedin: data }
+      objData
     )
     .then(resp => {
       console.log(resp.data);
-    });
+      return resp.data;
+    })
+    .catch(err => console.log(resp));
 };
+
+module.exports.postDataToAppsScript = postDataToAppsScript;
+
+function domain_from_url(url) {
+  var result;
+  var match;
+  if (
+    (match = url.match(
+      /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n\?\=]+)/im
+    ))
+  ) {
+    result = match[1];
+    if ((match = result.match(/^[^\.]+\.(.+\..+)$/))) {
+      result = match[1];
+    }
+  }
+  return result;
+}
