@@ -200,7 +200,7 @@ module.exports.testLocation = async linkedinData => {
 function getEmailsFromDomain(personData) {
   let { fullName, domain } = personData;
 
-  let url = `https://api.hunter.io/v2/email-finder?domain=${domain}&full_name=${fullName}&api_key=4847b3fd2f53da802f5346ac0268428dfcd19355`;
+  let url = `https://api.hunter.io/v2/email-finder?domain=${domain}&full_name=${fullName}&@company.com&api_key=4847b3fd2f53da802f5346ac0268428dfcd19355`;
   //   console.log(url);
   return axios
     .get(url)
@@ -229,8 +229,8 @@ const postDataToAppsScript = (data, name) => {
 module.exports.postDataToAppsScript = postDataToAppsScript;
 
 function domain_from_url(url) {
-  var result;
-  var match;
+  let result;
+  let match;
   if (
     (match = url.match(
       /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n\?\=]+)/im
