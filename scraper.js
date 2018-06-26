@@ -3,9 +3,9 @@ const { postDataToAppsScript, testLocation } = require("./index");
 // Promise interface
 
 function scrapeData(
-  link = `https://www.bing.com/search?q=site%3alinkedin.com+intitle%3achiropractor+AND+owner+AND+texas&qs=n&first=0`,
+  link = `https://www.bing.com/search?q=site%3alinkedin.com+intitle%3adesign+AND+owner+AND+texas&qs=n&first=600`,
   results = [],
-  count = 20
+  count = 1
 ) {
   scrapeIt(link, {
     // Fetch the articles
@@ -67,14 +67,14 @@ function scrapeData(
     console.log(countNextPage, oldCountNextPage);
     if (
       data.nextPage !== "" &&
-      parseInt(countNextPage) > parseInt(oldCountNextPage) &&
-      count > 0
+      parseInt(countNextPage) > parseInt(oldCountNextPage)
+      //  &&count > 0
     ) {
       scrapeData("https://www.bing.com" + data.nextPage, newData, count - 1);
     } else {
       // console.log(results[0]);
       postDataToAppsScript(results, "linkedin");
-        testLocation(results);
+      testLocation(results);
       return results;
     }
   });

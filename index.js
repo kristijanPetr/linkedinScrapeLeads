@@ -130,8 +130,8 @@ function getComponent(components, type) {
 }
 
 function getGooglePlacesApiKeys() {
-  const googlePlacesApiKeys =
-    "AIzaSyDsjn_rG3XK8Eg-nvfTtx5we1eaUJEVvVU,AIzaSyDFzy7tp6s06z9meoMP8T4b6Gh0fZoQVD8";
+  const googlePlacesApiKeys = "AIzaSyAYs45c3mO9TtLZnKtVE4iXgSfwBQB42to";
+  // "AIzaSyAYs45c3mO9TtLZnKtVE4iXgSfwBQB42to,AIzaSyDsjn_rG3XK8Eg-nvfTtx5we1eaUJEVvVU,AIzaSyDFzy7tp6s06z9meoMP8T4b6Gh0fZoQVD8";
   if (!googlePlacesApiKeys) {
     throw "No API keys provided." +
       "Go to File -> Project Properties -> Script Properties, then under ther property 'googlePlacesApiKeys'," +
@@ -178,9 +178,7 @@ module.exports.testLocation = async linkedinData => {
     placesArr.push([name, address, website, rating]);
 
     let domain = domain_from_url(website);
-    // console.log(domain);
     if (domain) {
-      //   console.log(name, website);
       let emailResp = await getEmailsFromDomain({
         fullName: name,
         domain
@@ -191,29 +189,15 @@ module.exports.testLocation = async linkedinData => {
           domain
         });
       }
-      emailLeads.push([name, filteredName, emailResp ?  emailResp.email : ""]);
-      //   console.log("EMAIL-->", emailResp.email);
+      emailLeads.push([name, filteredName, emailResp ? emailResp.email : ""]);
     }
-    //   });
   }
   console.log("PLACE INFO", placesArr);
   await postDataToAppsScript(placesArr, "places");
   await postDataToAppsScript(emailLeads, "emails");
 };
 
-// testLocation();
-
-// (async () => {
-//   //
-// })().catch(err => {
-//   console.error(err);
-// });
-
 function getEmailsFromDomain(personData) {
-  //   let firstName = "Austin";
-  //   let lastName = "Reynolds";
-  //   let fullName = "Austin Reynolds";
-  //   let domain = "greenjayhealth.com";
   let { fullName, domain } = personData;
 
   let url = `https://api.hunter.io/v2/email-finder?domain=${domain}&full_name=${fullName}&api_key=4847b3fd2f53da802f5346ac0268428dfcd19355`;
@@ -222,15 +206,10 @@ function getEmailsFromDomain(personData) {
     .get(url)
     .then(response => {
       let { data } = response.data;
-      // console.log(response.data);
       return data;
     })
     .catch(err => console.log(err));
-
-  //writeToEmailSheet(emailData)
 }
-
-// getEmailsFromDomain();
 
 const postDataToAppsScript = (data, name) => {
   let objData = { [name]: data };
