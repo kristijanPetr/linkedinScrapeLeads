@@ -1,10 +1,11 @@
 const scrapeIt = require("scrape-it");
-
+const { postDataToAppsScript } = require("./index");
 // Promise interface
 
 function scrapeData(
-  link = `https://www.bing.com/search?q=site%3alinkedin.com+intitle%3achiropractor+AND+owner+AND+texas&qs=n`,
-  results = []
+  link = `https://www.bing.com/search?q=site%3alinkedin.com+intitle%3achiropractor+AND+owner+AND+texas&qs=n&first=0`,
+  results = [],
+  count = 0
 ) {
   scrapeIt(link, {
     // Fetch the articles
@@ -54,9 +55,25 @@ function scrapeData(
     // console.log(`Status Code: ${response.statusCode}`);
 
     let newData = [...results, ...data.articles];
-    console.log(data.articles);
-    if (data.nextPage !== "") {
-      scrapeData("https://www.bing.com" + data.nextPage, newData);
+    // console.log(data.articles);
+    let countNextPage = data.nextPage
+      .toString()
+      .split("&first=")[1]
+      .split("&FORM=PORE")[0];
+    let oldCountNextPage = link
+      .toString()
+      .split("&first=")[1]
+      .split("&FORM=PORE")[0];
+    console.log(countNextPage, oldCountNextPage);
+    if (
+      data.nextPage !== "" &&
+      parseInt(countNextPage) > parseInt(oldCountNextPage)
+    ) {
+      scrapeData("https://www.bing.com" + data.nextPage, newData, count + 1);
+    } else {
+      console.log(results);
+      postDataToAppsScript(results);
+      return results;
     }
   });
 }

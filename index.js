@@ -163,7 +163,7 @@ async function testLocation(name) {
 }
 
 (async () => {
-  testLocation();
+  //testLocation();
 })().catch(err => {
   console.error(err);
 });
@@ -196,17 +196,15 @@ function getEmailsFromDomain() {
   //writeToEmailSheet(emailData)
 }
 
-getEmailsFromDomain();
+// getEmailsFromDomain();
 
-function postDataToAppsScript(data) {
+module.exports.postDataToAppsScript = data => {
   axios
     .post(
       "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
-      {
-        ...data
-      }
+      data
     )
     .then(resp => {
-      console.log(resp);
+      console.log(resp.data);
     });
-}
+};
