@@ -1,11 +1,14 @@
 const scrapeIt = require("scrape-it");
-const { postDataToAppsScript, testLocation } = require("./index");
+const { postDataToAppsScript, getMapsPlacesLocation } = require("./index");
 // Promise interface
 
 function scrapeData(
-  link = `https://www.bing.com/search?q=site%3alinkedin.com+intitle%3adesign+AND+owner+AND+texas&qs=n&first=600`,
+  link = `https://www.bing.com/search?q=site%3alinkedin.com+intitle%3aDevelopment+AND+owner+AND+Chicago&qs=n&first=0`, // whole query from
   results = [],
-  count = 1
+  location = "Chicago",
+  vertical = "Development",
+  count = 10,
+  scriptUrl
 ) {
   scrapeIt(link, {
     // Fetch the articles
@@ -68,16 +71,16 @@ function scrapeData(
     if (
       data.nextPage !== "" &&
       parseInt(countNextPage) > parseInt(oldCountNextPage)
-      //  &&count > 0
+       && count > 0
     ) {
       scrapeData("https://www.bing.com" + data.nextPage, newData, count - 1);
     } else {
       // console.log(results[0]);
-      postDataToAppsScript(results, "linkedin");
-      testLocation(results);
+      postDataToAppsScript(scriptUrl, results, "linkedin");
+      getMapsPlacesLocation(results, location, vertical,scriptUrl);
       return results;
     }
   });
 }
 
-scrapeData();
+module.exports.scraper = scrapeData;

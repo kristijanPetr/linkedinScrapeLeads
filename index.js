@@ -114,7 +114,7 @@ function getAddressComponents(place) {
       }
       return compTypes;
     }, {});
-    // Logger.log(result)
+
     return result;
   } else {
     return null;
@@ -141,24 +141,26 @@ function getGooglePlacesApiKeys() {
   }
 }
 
-module.exports.testLocation = async linkedinData => {
+module.exports.getMapsPlacesLocation = async (
+  linkedinData,
+  inputLocation,
+  vertical,
+  scriptUrl
+) => {
   let placesArr = [];
   let emailLeads = [];
   for (let i = 0; i < linkedinData.length; i++) {
     let link = linkedinData[i];
-    //   await linkedinData.map(async link => {
-    let splitted = link.name
-      .replace("Dr.", "")
-      .trim()
-      .split(" ");
 
+    let splitted = stripSpecalChar(link.name)
+      .split(" ")
+      .filter(item => item.length > 2);
     let filteredName = (splitted[0] + " " + splitted[1]).replace(
       /[^\w\s]/gi,
       ""
     );
 
-    let location = link.location;
-    let vertical = "chiropractor";
+    let location = link.location || `Location ${inputLocation}`;
 
     let placeData = await getGooglePlaceInfo(
       "" + filteredName + ", " + vertical + ", " + location + "",
@@ -177,7 +179,9 @@ module.exports.testLocation = async linkedinData => {
 
     placesArr.push([name, address, website, rating]);
 
-    let domain = domain_from_url(website);
+    let domain =
+      domain_from_url(website) || `${filteredName.replace(" ", "")}.com`;
+    // console.log("LINKEDIN DOMAIN", domain);
     if (domain) {
       let emailResp = await getEmailsFromDomain({
         fullName: name,
@@ -193,32 +197,69 @@ module.exports.testLocation = async linkedinData => {
     }
   }
   console.log("PLACE INFO", placesArr);
-  await postDataToAppsScript(placesArr, "places");
-  await postDataToAppsScript(emailLeads, "emails");
+  await postDataToAppsScript(scriptUrl, placesArr, "places");
+  await postDataToAppsScript(scriptUrl, emailLeads, "emails");
 };
 
-function getEmailsFromDomain(personData) {
-  let { fullName, domain } = personData;
+function getEmailsFromDomain(personData, count = 0) {
+  let { fullName = " ", domain } = personData;
 
-  let url = `https://api.hunter.io/v2/email-finder?domain=${domain}&full_name=${fullName}&@company.com&api_key=4847b3fd2f53da802f5346ac0268428dfcd19355`;
-  //   console.log(url);
+  console.log("Full name", fullName);
+  let queryParam = `domain=${domain}&full_name=${stripSpecalChar(fullName)
+    .split(" ")
+    .join("+")}`;
+
+  let url = `https://api.hunter.io/v2/email-finder?api_key=4847b3fd2f53da802f5346ac0268428dfcd19355&${queryParam}`;
+  console.log(url);
   return axios
     .get(url)
     .then(response => {
       let { data } = response.data;
+      if (!data.email) {
+        let newName = stripSpecalChar(fullName)
+          .split(" ")
+          .filter(item => item.length > 3);
+        //newName = fullName.length !== newName.length ? newName :
+        //.join("+");
+        if (newName.length > 2) {
+          newName.pop();
+          getEmailsFromDomain(
+            {
+              domain,
+              fullName: newName.join(" ")
+            },
+            count
+          );
+        }
+      }
       return data;
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      console.log(err.data);
+      count = count + 1;
+      let newName = stripSpecalChar(fullName)
+        .split(" ")
+        .filter(item => item.length > 2);
+      if (newName.length > 2) {
+        newName.pop();
+        getEmailsFromDomain({
+          domain,
+          fullName: newName.join(" ")
+        });
+      }
+      return null;
+    });
 }
 
-const postDataToAppsScript = (data, name) => {
+const postDataToAppsScript = (
+  scriptUrl = "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
+  data,
+  name
+) => {
   let objData = { [name]: data };
   console.log("OBJECT DATA", objData);
   return axios
-    .post(
-      "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
-      objData
-    )
+    .post(scriptUrl, objData)
     .then(resp => {
       console.log(resp.data);
       return resp.data;
@@ -242,4 +283,8 @@ function domain_from_url(url) {
     }
   }
   return result;
+}
+
+function stripSpecalChar(str) {
+  return str.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, " ");
 }
