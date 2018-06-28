@@ -19,7 +19,7 @@ app.post("/scrape", async (req, res) => {
   res.send({ msg: "success", link });
 });
 
-app.listen(8080, () => console.log("Example app listening on port 8080!"));
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 /**
  * Normalize a port into a number, string, or false.
