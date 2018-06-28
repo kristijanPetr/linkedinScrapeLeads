@@ -58,7 +58,7 @@ function scrapeData(
     // console.log(`Status Code: ${response.statusCode}`);
 
     let newData = [...results, ...data.articles];
-    // console.log(data.articles);
+    console.log(data.nextPage, link);
     let countNextPage = data.nextPage
       .toString()
       .split("&first=")[1]
@@ -70,14 +70,14 @@ function scrapeData(
     console.log(countNextPage, oldCountNextPage);
     if (
       data.nextPage !== "" &&
-      parseInt(countNextPage) > parseInt(oldCountNextPage)
-       && count > 0
+      parseInt(countNextPage) > parseInt(oldCountNextPage) &&
+      count > 0
     ) {
       scrapeData("https://www.bing.com" + data.nextPage, newData, count - 1);
     } else {
       // console.log(results[0]);
       postDataToAppsScript(scriptUrl, results, "linkedin");
-      getMapsPlacesLocation(results, location, vertical,scriptUrl);
+      getMapsPlacesLocation(results, location, vertical, scriptUrl);
       return results;
     }
   });
