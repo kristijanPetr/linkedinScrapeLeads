@@ -177,7 +177,15 @@ module.exports.getMapsPlacesLocation = async (
     );
     let { address, name, website = "", rating = "" } = placeIdInfo;
 
-    placesArr.push([name, address, website, rating]);
+    placesArr.push([
+      name,
+      splitted[0],
+      splitted[1],
+      link.link,
+      address,
+      website,
+      rating
+    ]);
 
     let domain =
       domain_from_url(website) || `${filteredName.replace(" ", "")}.com`;
@@ -193,7 +201,15 @@ module.exports.getMapsPlacesLocation = async (
           domain
         });
       }
-      emailLeads.push([name, filteredName, emailResp ? emailResp.email : ""]);
+      emailLeads.push([
+        name,
+        splitted[0],
+        splitted[1],
+        link.link,
+        website,
+        filteredName,
+        emailResp ? emailResp.email : ""
+      ]);
     }
   }
   console.log("PLACE INFO", placesArr);
