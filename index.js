@@ -217,6 +217,74 @@ module.exports.getMapsPlacesLocation = async (
   await postDataToAppsScript(scriptUrl, emailLeads, "emails");
 };
 
+function verifierEmailsFromKickBox(email) {
+  let urlVerifierKickBox = `https://api.kickbox.io/v2/verify?email=${email}&apikey=test_2ad03b689a49096faec5f8de18ecf79ae061f680b842911cc3452d717b56c347`;
+  return axios
+    .get(urlVerifierKickBox)
+    .then(response => {
+      //console.log(response.data.result);
+      if (response.status === 200 && response.data.result === "deliverable") {
+        // console.log("SENDEX: " + response.data.sendex);
+        // console.log("RESULT : " + response.data.result);
+        return {
+          email,
+          deliver: true,
+          score: response.data.sendex
+        };
+      }
+      if (
+        (response.status === 200 && response.data.result === "risky") ||
+        response.data.result === "undeliverable"
+      ) {
+        //console.log("RESULT : " + response.data.result);
+        return {
+          email,
+          deliver: false
+        };
+      }
+    })
+    .catch(err => ({
+      email,
+      deliver: false,
+      score: 0
+    }));
+}
+
+function verifierEmailsFromHunter(email) {
+  console.log(email);
+  let urlVerifierHunter = `https://api.hunter.io/v2/email-verifier?email=${email}&api_key=8a10a42514112a27a264762c496533d8fd22e1dc`;
+  return axios
+    .get(urlVerifierHunter)
+    .then(response => {
+      if (response.status === 200) {
+        // console.log(response.data);
+        if (response.data.data.score > 80) {
+          return {
+            email,
+            deliver: true,
+            score: response.data.data.score
+          };
+        } else {
+          return {
+            email,
+            deliver: false,
+            score: response.data.data.score
+          };
+        }
+      }
+      return {
+        email,
+        deliver: false,
+        score: 0
+      };
+    })
+    .catch(err => ({
+      email,
+      deliver: false,
+      score: 0
+    }));
+}
+
 function getEmailsFromDomain(personData, count = 0) {
   let { fullName = " ", domain } = personData;
 
@@ -226,6 +294,7 @@ function getEmailsFromDomain(personData, count = 0) {
     .join("+")}`;
 
   let url = `https://api.hunter.io/v2/email-finder?api_key=4847b3fd2f53da802f5346ac0268428dfcd19355&${queryParam}`;
+
   console.log(url);
   return axios
     .get(url)
@@ -304,3 +373,5 @@ function domain_from_url(url) {
 function stripSpecalChar(str) {
   return str.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, " ");
 }
+
+module.exports = { verifierEmailsFromHunter, verifierEmailsFromKickBox };
