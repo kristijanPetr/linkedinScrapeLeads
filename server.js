@@ -14,6 +14,18 @@ app.use(bodyParser.json());
 
 app.post("/scrape", async (req, res) => {
   const { query, vertical, location, scriptUrl } = req.body;
+  // let obj = {
+  //   location: "London",
+  //   query: " site:www.linkedin.com/in/ Owner AND London AND Development",
+  //   scriptUrl:
+  //     "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
+  //   vertical: "Development"
+  // };
+  // const { query, vertical, location, scriptUrl } = obj;
+  
+  if (!query || !vertical || !location || !scriptUrl) {
+    return res.status(401).send({ msg: "Not enough parametars." });
+  }
   let link = `https://www.bing.com/search?q=${query}&qs=n&first=0`;
   let results = await scraper(link, [], location, vertical, 10, scriptUrl);
   res.send({ msg: "success", link });

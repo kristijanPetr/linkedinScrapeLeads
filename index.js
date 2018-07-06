@@ -1,5 +1,7 @@
 const axios = require("axios");
 const { toLowerCamel } = require("./utils");
+const { scrapeEmailFromDomain } = require("./scrapeContactInfo");
+const { emailPermutator } = require("./permutate");
 
 function getGooglePlaceInfo(query, param, keys) {
   const key = keys[0];
@@ -141,7 +143,7 @@ function getGooglePlacesApiKeys() {
   }
 }
 
-module.exports.getMapsPlacesLocation = async (
+const getMapsPlacesLocation = async (
   linkedinData,
   inputLocation,
   vertical,
@@ -187,9 +189,10 @@ module.exports.getMapsPlacesLocation = async (
       rating
     ]);
 
-    let domain =
-      domain_from_url(website) || `${filteredName.replace(" ", "")}.com`;
-    // console.log("LINKEDIN DOMAIN", domain);
+    let domain = website.match(".*://?([^/]+)")
+      ? website.match(".*://?([^/]+)")[1]
+      : `${filteredName.replace(" ", "")}.com`;
+    console.log("DOMAIN", domain);
     if (domain) {
       let emailResp = await getEmailsFromDomain({
         fullName: name,
@@ -200,25 +203,42 @@ module.exports.getMapsPlacesLocation = async (
           fullName: filteredName,
           domain
         });
+      } else {
+        emailResp = {
+          email: "" // await scrapeEmailFromDomain(website || domainHttp)
+        };
+        //console.log("DOMAIN WITH HTTPS", domainHttp , website);
+        // console.log("EMAIL RESPONSE", emailResp);
       }
-      emailLeads.push([
-        name,
-        splitted[0],
-        splitted[1],
-        link.link,
-        website,
-        filteredName,
-        emailResp ? emailResp.email : ""
-      ]);
+      //  let domainHttp = `https://${domain}`;
+      let crawlEmail = await scrapeEmailFromDomain(website || domain);
+      let permutateEmails =
+        (await emailPermutator(splitted[0], splitted[1], domain)) || [];
+      let emails = [
+        ...[
+          name,
+          splitted[0],
+          splitted[1],
+          link.link,
+          website,
+          filteredName,
+          emailResp ? emailResp.email : "",
+          crawlEmail,
+          await asyncEmailSecondChecker(emailResp)
+        ],
+        ...permutateEmails
+      ];
+      //console.log("permutateEmails:",  permutateEmails.length);
+      emailLeads.push(emails);
     }
   }
-  console.log("PLACE INFO", placesArr);
+  // console.log("PLACE INFO", placesArr);
   await postDataToAppsScript(scriptUrl, placesArr, "places");
   await postDataToAppsScript(scriptUrl, emailLeads, "emails");
 };
 
 function verifierEmailsFromKickBox(email) {
-  let urlVerifierKickBox = `https://api.kickbox.io/v2/verify?email=${email}&apikey=test_2ad03b689a49096faec5f8de18ecf79ae061f680b842911cc3452d717b56c347`;
+  let urlVerifierKickBox = `https://api.kickbox.io/v2/verify?email=${email}&apikey=live_ad17a91b2ac8bd529142889dbf713551a167358e7b290dda147119dee789ca1e`;
   return axios
     .get(urlVerifierKickBox)
     .then(response => {
@@ -251,13 +271,13 @@ function verifierEmailsFromKickBox(email) {
 }
 
 function verifierEmailsFromHunter(email) {
-  console.log(email);
-  let urlVerifierHunter = `https://api.hunter.io/v2/email-verifier?email=${email}&api_key=8a10a42514112a27a264762c496533d8fd22e1dc`;
+  //console.log(email);
+  let urlVerifierHunter = `https://api.hunter.io/v2/email-verifier?email=${email}&api_key=4847b3fd2f53da802f5346ac0268428dfcd19355`;
   return axios
     .get(urlVerifierHunter)
     .then(response => {
       if (response.status === 200) {
-        // console.log(response.data);
+        console.log(response.data);
         if (response.data.data.score > 80) {
           return {
             email,
@@ -288,14 +308,13 @@ function verifierEmailsFromHunter(email) {
 function getEmailsFromDomain(personData, count = 0) {
   let { fullName = " ", domain } = personData;
 
-  console.log("Full name", fullName);
   let queryParam = `domain=${domain}&full_name=${stripSpecalChar(fullName)
     .split(" ")
     .join("+")}`;
 
   let url = `https://api.hunter.io/v2/email-finder?api_key=4847b3fd2f53da802f5346ac0268428dfcd19355&${queryParam}`;
-
-  console.log(url);
+  //console.log("getEmailsFromDomain", fullName);
+  //console.log(url);
   return axios
     .get(url)
     .then(response => {
@@ -308,7 +327,7 @@ function getEmailsFromDomain(personData, count = 0) {
         //.join("+");
         if (newName.length > 2) {
           newName.pop();
-          getEmailsFromDomain(
+          return getEmailsFromDomain(
             {
               domain,
               fullName: newName.join(" ")
@@ -320,23 +339,43 @@ function getEmailsFromDomain(personData, count = 0) {
       return data;
     })
     .catch(err => {
-      console.log(err.data);
+      console.log("LINE 328", domain);
+      console.log(err.message);
       count = count + 1;
       let newName = stripSpecalChar(fullName)
         .split(" ")
         .filter(item => item.length > 2);
       if (newName.length > 2) {
         newName.pop();
-        getEmailsFromDomain({
+        return getEmailsFromDomain({
           domain,
           fullName: newName.join(" ")
         });
       }
-      return null;
     });
 }
 
-const postDataToAppsScript = (
+async function asyncEmailSecondChecker(email) {
+  let deliver = false;
+  let checkerHunter = await verifierEmailsFromHunter(email);
+  //console.log("CHECKERHUNTER", checkerHunter);
+  if (!checkerHunter.deliver) {
+    let checkerKickBox = await verifierEmailsFromKickBox(email);
+    if (checkerKickBox.deliver) {
+      //console.log("DELIVERABLE", email);
+      deliver = true;
+      return deliver;
+    } else {
+      return deliver;
+    }
+  } else {
+    //console.log("DELIVERABLE", email);
+    deliver = true;
+    return deliver;
+  }
+}
+
+const postDataToAppsScript = async (
   scriptUrl = "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
   data,
   name
@@ -352,26 +391,11 @@ const postDataToAppsScript = (
     .catch(err => console.log(resp));
 };
 
-module.exports.postDataToAppsScript = postDataToAppsScript;
-
-function domain_from_url(url) {
-  let result;
-  let match;
-  if (
-    (match = url.match(
-      /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n\?\=]+)/im
-    ))
-  ) {
-    result = match[1];
-    if ((match = result.match(/^[^\.]+\.(.+\..+)$/))) {
-      result = match[1];
-    }
-  }
-  return result;
-}
-
 function stripSpecalChar(str) {
   return str.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, " ");
 }
 
-module.exports = { verifierEmailsFromHunter, verifierEmailsFromKickBox };
+module.exports = {
+  postDataToAppsScript,
+  getMapsPlacesLocation
+};

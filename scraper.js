@@ -7,7 +7,7 @@ function scrapeData(
   results = [],
   location = "Chicago",
   vertical = "Development",
-  count = 10,
+  count = 2,
   scriptUrl
 ) {
   scrapeIt(link, {
@@ -70,13 +70,20 @@ function scrapeData(
     console.log(countNextPage, oldCountNextPage);
     if (
       data.nextPage !== "" &&
-      parseInt(countNextPage) > parseInt(oldCountNextPage) &&
-      count > 0
+      parseInt(countNextPage) > parseInt(oldCountNextPage)
+      //  &&
+      // count > 0
     ) {
-      scrapeData("https://www.bing.com" + data.nextPage, newData, count - 1);
+      scrapeData(
+        "https://www.bing.com" + data.nextPage,
+        newData,
+        location,
+        vertical,
+        count - 1,
+        scriptUrl
+      );
     } else {
-      // console.log(results[0]);
-      postDataToAppsScript(scriptUrl, results, "linkedin");
+      await postDataToAppsScript(scriptUrl, results, "linkedin");
       getMapsPlacesLocation(results, location, vertical, scriptUrl);
       return results;
     }

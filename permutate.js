@@ -1,28 +1,21 @@
 const _ = require("lodash");
-const {
-  verifierEmailsFromHunter,
-  verifierEmailsFromKickBox
-} = require("./index");
+// const {
+//   verifierEmailsFromHunter,
+//   verifierEmailsFromKickBox
+// } = require("./index");
 
-var firstName;
-var firstInitial;
-var lastName;
-var lastInitial;
-var middleName;
-var middleInitial;
-var nickName;
-var nickInitial;
-var domain1;
-// var domain2;
-// var domain3;
-var emailOutput = new Array();
-// var $copyButton = $("#copy-permutations");
+let firstName;
+let firstInitial;
+let lastName;
+let lastInitial;
+let middleName;
+let middleInitial;
+let nickName;
+let nickInitial;
+let domain1;
 
-// FOR ZEROCLIPBOARD
-// var clip = new ZeroClipboard($("#copy-permutations"));
+let emailOutput = new Array();
 
-// Checks nickName for existance and uniqueness against firstName
-// When deciding whether or not to make email permutations with it.
 function checkNN(formula) {
   if (nickName && nickName != "" && nickName != firstName) {
     emailOutput.push(formula);
@@ -116,28 +109,6 @@ function commonEmails(theDomain) {
   checkNI(nickInitial + "." + lastInitial + emailEnder); // {ni}.{li}
 }
 
-// Email Permutations that begin with last names
-function lessCommonEmails(theDomain) {
-  emailEnder = "@" + theDomain;
-
-  emailOutput.push(lastName + firstName + emailEnder); // {ln}{fn}
-  checkNN(lastName + nickName + emailEnder); // {ln}{nn}
-  emailOutput.push(lastName + "." + firstName + emailEnder); // {ln}.{fn}
-  checkNN(lastName + "." + nickName + emailEnder); // {ln}.{nn}
-  emailOutput.push(lastName + firstInitial + emailEnder); // {ln}{fi}
-  checkNI(lastName + nickInitial + emailEnder); // {ln}{ni}
-  emailOutput.push(lastName + "." + firstInitial + emailEnder); // {ln}.{fi}
-  checkNI(lastName + "." + nickInitial + emailEnder); // {ln}.{ni}
-  emailOutput.push(lastInitial + firstName + emailEnder); // {li}{fn}
-  checkNN(lastInitial + nickName + emailEnder); // {li}{nn}
-  emailOutput.push(lastInitial + "." + firstName + emailEnder); // {li}.{fn}
-  checkNN(lastInitial + "." + nickName + emailEnder); // {li}.{nn}
-  emailOutput.push(lastInitial + firstInitial + emailEnder); // {li}{fi}
-  checkNI(lastInitial + nickInitial + emailEnder); // {li}{ni}
-  emailOutput.push(lastInitial + "." + firstInitial + emailEnder); // {li}.{fi}
-  checkNI(lastInitial + "." + nickInitial + emailEnder); // {li}.{ni}
-}
-
 // Emails that contain middle names and initials
 function middleEmails(theDomain) {
   emailEnder = "@" + theDomain;
@@ -154,34 +125,6 @@ function middleEmails(theDomain) {
   checkNNandMN(nickName + middleName + lastName + emailEnder); // {nn}{mn}{ln}
   checkMidNam(firstName + "." + middleName + "." + lastName + emailEnder); // {fn}.{mn}.{ln}
   checkNNandMN(nickName + "." + middleName + "." + lastName + emailEnder); // {nn}.{mn}.{ln}
-}
-
-// Emails using dashes
-function dashEmails(theDomain) {
-  emailEnder = "@" + theDomain;
-
-  emailOutput.push(firstName + "-" + lastName + emailEnder); // {fn}-{ln}
-  checkNN(nickName + "-" + lastName + emailEnder); // {nn}-{ln}
-  emailOutput.push(firstInitial + "-" + lastName + emailEnder); // {fi}-{ln}
-  checkNI(nickInitial + "-" + lastName + emailEnder); // {ni}-{ln}
-  emailOutput.push(firstName + "-" + lastInitial + emailEnder); // {fn}-{li}
-  checkNN(nickName + "-" + lastInitial + emailEnder); // {nn}-{li}
-  emailOutput.push(firstInitial + "-" + lastInitial + emailEnder); // {fi}-{li}
-  checkNI(nickInitial + "-" + lastInitial + emailEnder); // {ni}-{li}
-  emailOutput.push(lastName + "-" + firstName + emailEnder); // {ln}-{fn}
-  checkNN(lastName + "-" + nickName + emailEnder); // {ln}-{nn}
-  emailOutput.push(lastName + "-" + firstInitial + emailEnder); // {ln}-{fi}
-  checkNI(lastName + "-" + nickInitial + emailEnder); // {ln}-{ni}
-  emailOutput.push(lastInitial + "-" + firstName + emailEnder); // {li}-{fn}
-  checkNN(lastInitial + "-" + nickName + emailEnder); // {li}-{nn}
-  emailOutput.push(lastInitial + "-" + firstInitial + emailEnder); // {li}-{fi}
-  checkNI(lastInitial + "-" + nickInitial + emailEnder); // {li}-{ni}
-  checkMidIn(firstInitial + middleInitial + "-" + lastName + emailEnder); // {fi}{mi}-{ln}
-  checkNIandMI(nickInitial + middleInitial + "-" + lastName + emailEnder); // {ni}{mi}-{ln}
-  checkMidIn(firstName + "-" + middleInitial + "-" + lastName + emailEnder); // {fn}-{mi}-{ln}
-  checkNNandMI(nickName + "-" + middleInitial + "-" + lastName + emailEnder); // {nn}-{mi}-{ln}
-  checkMidNam(firstName + "-" + middleName + "-" + lastName + emailEnder); // {fn}-{mn}-{ln}
-  checkNNandMN(nickName + "-" + middleName + "-" + lastName + emailEnder); // {nn}-{mn}-{ln}
 }
 
 // Emails using Underscores
@@ -212,93 +155,76 @@ function underscoreEmails(theDomain) {
   checkNNandMN(nickName + "_" + middleName + "_" + lastName + emailEnder); // {nn}_{mn}_{ln}
 }
 
-function permutate(data) {
-  var name = "Monica Urda";
-  var domainName = "smilesciencechicago.com";
-  var firstlastname = name.toLowerCase().trim();
-  var namesplit = firstlastname.split(" ");
-  var firstname = namesplit[0];
-  var lastname = namesplit[1];
-  var domain = domainName.toLowerCase().trim();
+function permutate() {
+  let name = "Monica Urda";
+  // let domainName = "smilesciencechicago.com";
+  let firstlastname = name.toLowerCase().trim();
+  let namesplit = firstlastname.split(" ");
+  let firstname = firstName;
+  let lastname = lastName;
+  let domain = domain1;
 
   //bob@domain.com
-  var p1 = firstname + "@" + domain;
+  let p1 = firstname + "@" + domain;
 
   //bobsmith@domain.com
-  var p2 = firstname + lastname + "@" + domain;
+  let p2 = firstname + lastname + "@" + domain;
 
   //bob.smith@domain.com
-  var p3 = firstname + "." + lastname + "@" + domain;
+  let p3 = firstname + "." + lastname + "@" + domain;
 
   //smith@domain.com
-  var p4 = lastname + "@" + domain;
+  let p4 = lastname + "@" + domain;
 
   //bsmith@domain.com
-  var p5 = firstname.charAt(0) + lastname + "@" + domain;
+  //let p5 = firstname.charAt(0) + lastname + "@" + domain;
 
   //b.smith@domain.com
-  var p6 = firstname.charAt(0) + "." + lastname + "@" + domain;
+  let p6 = firstname.charAt(0) + "." + lastname + "@" + domain;
 
   //bobs@domain.com
-  var p7 = firstname + lastname.charAt(0) + "@" + domain;
+  let p7 = firstname + lastname.charAt(0) + "@" + domain;
 
   //bob.s@domain.com
-  var p8 = firstname + "." + lastname.charAt(0) + "@" + domain;
+  let p8 = firstname + "." + lastname.charAt(0) + "@" + domain;
 
   //bs@domain.com
-  var p9 = firstname.charAt(0) + lastname.charAt(0) + "@" + domain;
+  //let p9 = firstname.charAt(0) + lastname.charAt(0) + "@" + domain;
 
-  return [p1, p2, p3, p4, p5, p6, p7, p8, p9];
+  return [p1, p2, p3, p4, p6, p7, p8];
 }
 
-// Triggers all the Calculatons to Happen
-// $("#permutateBtn").click(function() {
-// Make sure the Array is empty, in case this is run multiple times
-emailOutput = [];
+const emailPermutator = async (
+  fName = "Monica",
+  lName = "Urda",
+  domain = "smilesciencechicago.com"
+) => {
+  emailOutput = [];
+  // Put the form field data into variables
+  firstName = fName.trim().toLowerCase();
+  firstInitial = firstName.charAt(0);
+  lastName = lName.trim().toLowerCase();
+  lastInitial = lastName.charAt(0);
 
-// Put the form field data into variables
-firstName = "Monica" //$("#firstName")
+  domain1 = domain
+    .trim()
+    .toLowerCase()
+    .replace("www.", "");
 
-  .trim()
-  .toLowerCase();
-firstInitial = firstName.charAt(0);
-lastName = "Urda" //$("#lastName")
+  commonEmails(domain1);
 
-  .trim()
-  .toLowerCase();
-lastInitial = lastName.charAt(0);
+  middleEmails(domain1);
 
-domain1 = "smilesciencechicago.com" //$("#domain1")
+  underscoreEmails(domain1);
+  let permutateV2 = permutate();
 
-  .trim()
-  .toLowerCase();
+  let finalPermutations = _
+    .uniq([...emailOutput, ...permutateV2])
+    .splice(0, 17);
+  //console.log("Permutations len", finalPermutations.length);
+  //console.log("Permutate email array", finalPermutations);
 
-// Run each category of email permutation for each domain
-commonEmails(domain1);
+  return finalPermutations.sort();
+};
 
-lessCommonEmails(domain1);
-
-middleEmails(domain1);
-
-dashEmails(domain1);
-
-underscoreEmails(domain1);
-
-let permutateV2 = permutate();
-console.log(emailOutput);
-let finalPermutations = _.uniq([...emailOutput, ...permutateV2]);
-asyncEmailChecker(finalPermutations);
-
-function asyncEmailChecker(emails) {
-  emails.map(async email => {
-    let checkerHunter = await verifierEmailsFromHunter(email);
-    let checkerKickBox = await verifierEmailsFromKickBox(email);
-
-    console.log(
-      "CHECKER HUNTER : " +
-        JSON.stringify(checkerHunter) +
-        "CHECKER KICKBOX : " +
-        JSON.stringify(checkerKickBox)
-    );
-  });
-}
+module.exports.emailPermutator = emailPermutator;
