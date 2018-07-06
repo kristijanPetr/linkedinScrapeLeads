@@ -7,7 +7,7 @@ async function emailCrawler(website) {
   console.log("CRAWLER WEBSITE", website);
   // A level is how far removed (in  terms of link clicks) a page is from the root page (only follows same domain routes)
   return await emailscraper
-    .getLevels(3)
+    .getLevels(2)
     .then(async emails => {
       console.log("CRAWLER", emails); // Here are the emails crawled from traveling two levels down this domain
       // await fs.appendFileSync(
