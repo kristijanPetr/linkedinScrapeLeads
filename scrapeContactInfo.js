@@ -14,7 +14,7 @@ async function emailCrawler(website) {
       //   "emailCrawlData.txt",
       //   `${website} email: ${emails[0]} \n`
       // );
-      return emails.length > 0 ? emails[0] : "";
+      return emails.length > 0 ? emails.join(',') : "";
     })
     .catch(e => {
       console.log("error");

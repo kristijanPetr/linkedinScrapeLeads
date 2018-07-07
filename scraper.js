@@ -60,9 +60,11 @@ function scrapeData(
     let newData = [...results, ...data.articles];
     console.log(data.nextPage, link);
     let countNextPage = data.nextPage
-      .toString()
-      .split("&first=")[1]
-      .split("&FORM=PORE")[0];
+      ? data.nextPage
+          .toString()
+          .split("&first=")[1]
+          .split("&FORM=PORE")[0]
+      : null;
     let oldCountNextPage = link
       .toString()
       .split("&first=")[1]
