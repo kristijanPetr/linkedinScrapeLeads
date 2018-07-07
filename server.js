@@ -23,6 +23,7 @@ app.post("/scrape", async (req, res) => {
   // };
   // const { query, vertical, location, scriptUrl } = obj;
   
+  
   if (!query || !vertical || !location || !scriptUrl) {
     return res.status(401).send({ msg: "Not enough parametars." });
   }
