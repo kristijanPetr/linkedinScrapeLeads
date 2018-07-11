@@ -2,6 +2,7 @@ const axios = require("axios");
 const { toLowerCamel } = require("./utils");
 const { scrapeEmailFromDomain } = require("./scrapeContactInfo");
 const { emailPermutator } = require("./permutate");
+const emailCheck = require("email-check");
 
 function getGooglePlaceInfo(query, param, keys) {
   const key = keys[0];
@@ -13,15 +14,12 @@ function getGooglePlaceInfo(query, param, keys) {
     const queryString =
       "?" + param + "=" + encodeURIComponent(query) + "&key=" + key;
     const url = googlePlacesUrl + queryString;
-    //  Logger.log(url)
-    // Make API call
+    //Make API call
     return axios.get(url).then(response => {
       if (response.status === 200) {
         const data = response.data;
-        // console.log(data);
         if (data.status === "OK") {
-          // Logger.log(data)
-          // If success, return location info for first match
+          //If success, return location info for first match
           let place =
             param.toLowerCase() === "query" ? data.results[0] : data.result;
           return {
@@ -43,16 +41,13 @@ function getGooglePlaceInfo(query, param, keys) {
       }
     });
   }
-  // Otherwise return null
   return null;
 }
 
 function buildAddressFromComponents(place) {
   const components = getAddressComponents(place);
-
   if (components) {
     const address = [[], [], [], []];
-
     if (components.streetNumber) {
       address[0].push(components.streetNumber);
     }
@@ -62,25 +57,21 @@ function buildAddressFromComponents(place) {
     if (address[0].length === 0 && components.neighborhood) {
       address[0].push(components.neighborhood);
     }
-
     if (components.sublocality) {
       address[1].push(components.sublocality);
     }
     if (address[1].length === 0 && components.locality) {
       address[1].push(components.locality);
     }
-
     if (components.administrativeAreaLevel1) {
       address[2].push(components.administrativeAreaLevel1);
     }
     if (components.postalCode) {
       address[2].push(components.postalCode);
     }
-
     if (components.country && components.country !== "US") {
       address[3].push(components.country);
     }
-
     return address
       .filter(function(part) {
         return part.length !== 0;
@@ -116,7 +107,6 @@ function getAddressComponents(place) {
       }
       return compTypes;
     }, {});
-
     return result;
   } else {
     return null;
@@ -133,7 +123,6 @@ function getComponent(components, type) {
 
 function getGooglePlacesApiKeys() {
   const googlePlacesApiKeys = "AIzaSyAYs45c3mO9TtLZnKtVE4iXgSfwBQB42to";
-  // "AIzaSyAYs45c3mO9TtLZnKtVE4iXgSfwBQB42to,AIzaSyDsjn_rG3XK8Eg-nvfTtx5we1eaUJEVvVU,AIzaSyDFzy7tp6s06z9meoMP8T4b6Gh0fZoQVD8";
   if (!googlePlacesApiKeys) {
     throw "No API keys provided." +
       "Go to File -> Project Properties -> Script Properties, then under ther property 'googlePlacesApiKeys'," +
@@ -153,7 +142,6 @@ const getMapsPlacesLocation = async (
   let emailLeads = [];
   for (let i = 0; i < linkedinData.length; i++) {
     let link = linkedinData[i];
-
     let splitted = stripSpecalChar(link.name)
       .split(" ")
       .filter(item => item.length > 2);
@@ -161,9 +149,7 @@ const getMapsPlacesLocation = async (
       /[^\w\s]/gi,
       ""
     );
-
     let location = link.location || `Location ${inputLocation}`;
-
     let placeData = await getGooglePlaceInfo(
       "" + filteredName + ", " + vertical + ", " + location + "",
       "query",
@@ -192,7 +178,6 @@ const getMapsPlacesLocation = async (
     let domain = website.match(".*://?([^/]+)")
       ? website.match(".*://?([^/]+)")[1]
       : `${filteredName.replace(" ", "")}.com`;
-    console.log("DOMAIN", domain);
     if (domain) {
       let emailResp = await getEmailsFromDomain({
         fullName: name,
@@ -205,12 +190,9 @@ const getMapsPlacesLocation = async (
         });
       } else {
         emailResp = {
-          email: "" // await scrapeEmailFromDomain(website || domainHttp)
+          email: ""
         };
-        //console.log("DOMAIN WITH HTTPS", domainHttp , website);
-        // console.log("EMAIL RESPONSE", emailResp);
       }
-      //  let domainHttp = `https://${domain}`;
       let crawlEmail = await scrapeEmailFromDomain(website || domain);
       let permutateEmails =
         (await emailPermutator(splitted[0], splitted[1], domain)) || [];
@@ -223,16 +205,15 @@ const getMapsPlacesLocation = async (
           website,
           filteredName,
           emailResp ? emailResp.email : "",
-          crawlEmail,
-          await asyncEmailSecondChecker(emailResp)
+          await asyncEmailSecondChecker(emailResp),
+          await checkEmailIfExist(emailResp),
+          crawlEmail
         ],
         ...permutateEmails
       ];
-      //console.log("permutateEmails:",  permutateEmails.length);
       emailLeads.push(emails);
     }
   }
-  // console.log("PLACE INFO", placesArr);
   await postDataToAppsScript(scriptUrl, placesArr, "places");
   await postDataToAppsScript(scriptUrl, emailLeads, "emails");
 };
@@ -242,10 +223,7 @@ function verifierEmailsFromKickBox(email) {
   return axios
     .get(urlVerifierKickBox)
     .then(response => {
-      //console.log(response.data.result);
       if (response.status === 200 && response.data.result === "deliverable") {
-        // console.log("SENDEX: " + response.data.sendex);
-        // console.log("RESULT : " + response.data.result);
         return {
           email,
           deliver: true,
@@ -256,7 +234,6 @@ function verifierEmailsFromKickBox(email) {
         (response.status === 200 && response.data.result === "risky") ||
         response.data.result === "undeliverable"
       ) {
-        //console.log("RESULT : " + response.data.result);
         return {
           email,
           deliver: false
@@ -271,14 +248,12 @@ function verifierEmailsFromKickBox(email) {
 }
 
 function verifierEmailsFromHunter(email) {
-  //console.log(email);
   let urlVerifierHunter = `https://api.hunter.io/v2/email-verifier?email=${email}&api_key=4847b3fd2f53da802f5346ac0268428dfcd19355`;
   return axios
     .get(urlVerifierHunter)
     .then(response => {
       if (response.status === 200) {
-        console.log(response.data);
-        if (response.data.data.score > 80) {
+       if (response.data.data.score > 80) {
           return {
             email,
             deliver: true,
@@ -311,10 +286,8 @@ function getEmailsFromDomain(personData, count = 0) {
   let queryParam = `domain=${domain}&full_name=${stripSpecalChar(fullName)
     .split(" ")
     .join("+")}`;
-
   let url = `https://api.hunter.io/v2/email-finder?api_key=4847b3fd2f53da802f5346ac0268428dfcd19355&${queryParam}`;
-  //console.log("getEmailsFromDomain", fullName);
-  //console.log(url);
+
   return axios
     .get(url)
     .then(response => {
@@ -323,8 +296,6 @@ function getEmailsFromDomain(personData, count = 0) {
         let newName = stripSpecalChar(fullName)
           .split(" ")
           .filter(item => item.length > 3);
-        //newName = fullName.length !== newName.length ? newName :
-        //.join("+");
         if (newName.length > 2) {
           newName.pop();
           return getEmailsFromDomain(
@@ -358,21 +329,28 @@ function getEmailsFromDomain(personData, count = 0) {
 async function asyncEmailSecondChecker(email) {
   let deliver = false;
   let checkerHunter = await verifierEmailsFromHunter(email);
-  //console.log("CHECKERHUNTER", checkerHunter);
   if (!checkerHunter.deliver) {
     let checkerKickBox = await verifierEmailsFromKickBox(email);
     if (checkerKickBox.deliver) {
-      //console.log("DELIVERABLE", email);
       deliver = true;
       return deliver;
     } else {
       return deliver;
     }
   } else {
-    //console.log("DELIVERABLE", email);
     deliver = true;
     return deliver;
   }
+}
+
+async function checkEmailIfExist(email) {
+  return emailCheck(email)
+    .then(function(res) {
+     return res;
+    })
+    .catch(function(err) {
+      return false;
+    });
 }
 
 const postDataToAppsScript = async (
@@ -381,11 +359,9 @@ const postDataToAppsScript = async (
   name
 ) => {
   let objData = { [name]: data };
-  console.log("OBJECT DATA", objData);
   return axios
     .post(scriptUrl, objData)
     .then(resp => {
-      console.log(resp.data);
       return resp.data;
     })
     .catch(err => console.log(resp));

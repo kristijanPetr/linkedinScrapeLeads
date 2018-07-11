@@ -1,13 +1,13 @@
 const scrapeIt = require("scrape-it");
 const { postDataToAppsScript, getMapsPlacesLocation } = require("./index");
-// Promise interface
 
+// Promise interface
 function scrapeData(
   link = `https://www.bing.com/search?q=site%3alinkedin.com+intitle%3aDevelopment+AND+owner+AND+Chicago&qs=n&first=0`, // whole query from
   results = [],
   location = "Chicago",
   vertical = "Development",
-  count = 2,
+  count = 10,
   scriptUrl
 ) {
   scrapeIt(link, {
@@ -17,7 +17,6 @@ function scrapeData(
       data: {
         // Get the title
         name: "a",
-
         // Nested list
         link: "cite",
         snippet: ".b_caption > p",
@@ -38,13 +37,8 @@ function scrapeData(
           selector: ".b_vlist2col > ul:nth-child(2) li:nth-child(2)",
           how: "text"
         }
-        // Get attribute value of root listItem by omitting the selector
-        // classes: {
-        //   attr: "class"
-        // }
       }
     },
-
     // Fetch some other data from the page
     nextPage: {
       selector: ".sb_pagN",
@@ -55,10 +49,9 @@ function scrapeData(
       convert: x => (x.includes("Of") ? x.split("Of")[1] : x)
     }
   }).then(async ({ data, response }) => {
-    // console.log(`Status Code: ${response.statusCode}`);
-
     let newData = [...results, ...data.articles];
     console.log(data.nextPage, link);
+
     let countNextPage = data.nextPage
       ? data.nextPage
           .toString()
@@ -73,7 +66,7 @@ function scrapeData(
     if (
       data.nextPage !== "" &&
       parseInt(countNextPage) > parseInt(oldCountNextPage)
-      //  &&
+      // &&
       // count > 0
     ) {
       scrapeData(
@@ -91,5 +84,6 @@ function scrapeData(
     }
   });
 }
-
-module.exports.scraper = scrapeData;
+module.exports = {
+  scraper: scrapeData
+};

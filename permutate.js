@@ -1,8 +1,4 @@
 const _ = require("lodash");
-// const {
-//   verifierEmailsFromHunter,
-//   verifierEmailsFromKickBox
-// } = require("./index");
 
 let firstName;
 let firstInitial;
@@ -221,9 +217,6 @@ const emailPermutator = async (
   let finalPermutations = _
     .uniq([...emailOutput, ...permutateV2])
     .splice(0, 17);
-  //console.log("Permutations len", finalPermutations.length);
-  //console.log("Permutate email array", finalPermutations);
-
   return finalPermutations.sort();
 };
 
