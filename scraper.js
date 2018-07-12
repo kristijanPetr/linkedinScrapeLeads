@@ -66,8 +66,8 @@ function scrapeData(
     if (
       data.nextPage !== "" &&
       parseInt(countNextPage) > parseInt(oldCountNextPage)
-      // &&
-      // count > 0
+      &&
+      count > 0
     ) {
       scrapeData(
         "https://www.bing.com" + data.nextPage,

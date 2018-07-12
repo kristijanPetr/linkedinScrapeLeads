@@ -25,7 +25,7 @@ app.post("/scrape", async (req, res) => {
     return res.status(401).send({ msg: "Not enough parametars." });
   }
   let link = `https://www.bing.com/search?q=${query}&qs=n&first=0`;
-  let results = await scraper(link, [], location, vertical, 10, scriptUrl);
+  let results = await scraper(link, [], location, vertical, 5, scriptUrl);
 
   res.send({ msg: "success", link });
 });
