@@ -17,15 +17,15 @@ let limiter = new RateLimit({
 
 app.use(bodyParser.json());
 //  apply to all requests
-app.use(limiter);
+app.use("/scrape", limiter);
 
 app.post("/scrape", async (req, res) => {
-  const { query, vertical, location, scriptUrl } = req.body;
+  const { query, vertical, location, scriptUrl, count } = req.body;
   if (!query || !vertical || !location || !scriptUrl) {
     return res.status(401).send({ msg: "Not enough parametars." });
   }
   let link = `https://www.bing.com/search?q=${query}&qs=n&first=0`;
-  let results = await scraper(link, [], location, vertical, 5, scriptUrl);
+  let results = await scraper(link, [], location, vertical, count, scriptUrl);
 
   res.send({ msg: "success", link });
 });

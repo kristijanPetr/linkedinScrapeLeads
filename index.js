@@ -3,6 +3,7 @@ const { toLowerCamel } = require("./utils");
 const { scrapeEmailFromDomain } = require("./scrapeContactInfo");
 const { emailPermutator } = require("./permutate");
 const emailCheck = require("email-check");
+const { getLocationYelp } = require("./yelpLocation");
 
 function getGooglePlaceInfo(query, param, keys) {
   const key = keys[0];
@@ -156,7 +157,17 @@ const getMapsPlacesLocation = async (
       getGooglePlacesApiKeys()
     );
 
-    if (!placeData) continue;
+    if (!placeData) {
+      let yelpAddress = await getLocationYelp(filteredName, location);
+      if (!yelpAddress) continue;
+      placeData = await getGooglePlaceInfo(
+        "" + filteredName + ", " + vertical + ", " + yelpAddress + "",
+        "query",
+        getGooglePlacesApiKeys()
+      );
+      if (!placeData) continue;
+      continue;
+    }
 
     let placeIdInfo = await getGooglePlaceInfo(
       placeData.placeId,
@@ -253,7 +264,7 @@ function verifierEmailsFromHunter(email) {
     .get(urlVerifierHunter)
     .then(response => {
       if (response.status === 200) {
-       if (response.data.data.score > 80) {
+        if (response.data.data.score > 80) {
           return {
             email,
             deliver: true,
@@ -346,7 +357,7 @@ async function asyncEmailSecondChecker(email) {
 async function checkEmailIfExist(email) {
   return emailCheck(email)
     .then(function(res) {
-     return res;
+      return res;
     })
     .catch(function(err) {
       return false;
