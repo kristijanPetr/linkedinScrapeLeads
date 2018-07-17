@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const { scraper } = require("./scraper");
+const { pickProxiesIp } = require("./proxies");
 let RateLimit = require("express-rate-limit");
 
 const PORT = 4000;
@@ -24,8 +25,17 @@ app.post("/scrape", async (req, res) => {
   if (!query || !vertical || !location || !scriptUrl) {
     return res.status(401).send({ msg: "Not enough parametars." });
   }
-  let link = `https://www.bing.com/search?q=${query}&qs=n&first=0`;
-  let results = await scraper(link, [], location, vertical, count, scriptUrl);
+  let link = `http://www.bing.com/search?q=${query}&qs=n&first=0`;
+  let proxyIp = await pickProxiesIp();
+  let results = await scraper(
+    link,
+    [],
+    location,
+    vertical,
+    count,
+    scriptUrl,
+    proxyIp
+  );
 
   res.send({ msg: "success", link });
 });
