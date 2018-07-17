@@ -18,7 +18,7 @@ async function scrapeData(
     })
     .then(async resp => {
       let html = resp.data;
-      console.log("AXIOS HTML", html);
+      // console.log("AXIOS HTML", html);
       let data = scrapeIt.scrapeHTML(html, {
         // Fetch the articles
         articles: {

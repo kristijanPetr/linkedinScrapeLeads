@@ -40,11 +40,11 @@ async function pickProxiesIp() {
     }
     console.log(
       "PICKED IP ",
-      arrTimes.sort((a, b) => (a.responseTime > b.responseTime ? 1 : -1))[0].ip
+      arrTimes.sort((a, b) => (a.responseTime > b.responseTime ? 1 : -1))[5].ip
     );
     return arrTimes.sort(
       (a, b) => (a.responseTime > b.responseTime ? 1 : -1)
-    )[0].ip;
+    )[5].ip;
   }); //=> ["50.93.200.237:2018", ...]
 }
 
