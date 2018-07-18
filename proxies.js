@@ -1,17 +1,27 @@
 const axios = require("axios");
+const scrapeIt = require("scrape-it");
+
+async function getProxysFromUrl() {
+  return await axios.get("https://proxy.l337.tech/txt").then(resp => {
+    let respData = resp.data.split("\n");
+    respData = respData.filter(v => v != "");
+    console.log(respData);
+    return respData;
+  });
+}
 
 async function pickProxiesIp() {
   const proxylist = require("proxylist");
-  return proxylist.main().then(async list => {
+  return await proxylist.main().then(async list => {
     console.log(list.length);
     let arrTimes = [];
-    for (let i = 0; i < proxies.length / 10; i++) {
-      console.log("IP", proxies[i]);
+    for (let i = 0; i < Math.floor(list.length / 5); i++) {
+      console.log("IP", list[i]);
       let proxy = {
-        ip: proxies[i].split(":")[0],
-        port: proxies[i].split(":")[1]
+        ip: list[i].split(":")[0],
+        port: list[i].split(":")[1]
       };
-
+      console.log("PROXY ", proxy);
       var start = new Date();
       try {
         await axios
@@ -24,10 +34,27 @@ async function pickProxiesIp() {
           )
           .then(resp => {
             var responseTime = new Date() - start;
-            resp.data.length > 90000
+
+            // New Line
+
+            let dataScrape = scrapeIt.scrapeHTML(resp.data, {
+              // Fetch some other data from the page
+              nextPage: {
+                selector: ".sb_pagN",
+                attr: "href"
+              },
+              count: {
+                selector: ".sb_count",
+                convert: x => (x.includes("Of") ? x.split("Of")[1] : x)
+              }
+            });
+            console.log(dataScrape);
+            // END NEW LINE
+
+            dataScrape.nextPage !== ""
               ? arrTimes.push({
                   responseTime,
-                  ip: proxies[i]
+                  ip: list[i]
                 })
               : false;
             console.log("RESPONSE TIME", responseTime);

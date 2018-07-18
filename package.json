@@ -20,6 +20,7 @@
     "express": "^4.16.3",
     "express-rate-limit": "^2.11.0",
     "lodash": "^4.17.10",
+    "node-json-db": "^0.7.5",
     "proxylist": "^1.0.2",
     "request": "^2.87.0",
     "request-promise": "^4.2.2",

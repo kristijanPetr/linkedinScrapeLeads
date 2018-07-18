@@ -4,6 +4,8 @@ const bodyParser = require("body-parser");
 const { scraper } = require("./scraper");
 const { pickProxiesIp } = require("./proxies");
 let RateLimit = require("express-rate-limit");
+const JsonDB = require("node-json-db");
+const db = new JsonDB("myDataBase", true, false);
 
 const PORT = 4000;
 /**
@@ -26,7 +28,9 @@ app.post("/scrape", async (req, res) => {
     return res.status(401).send({ msg: "Not enough parametars." });
   }
   let link = `http://www.bing.com/search?q=${query}&qs=n&first=0`;
-  let proxyIp = await pickProxiesIp();
+  //let proxyIp = await pickProxiesIp();
+  let proxyIp = require("./myDataBase.json");
+  console.log(proxyIp);
   let results = await scraper(
     link,
     [],
@@ -34,10 +38,15 @@ app.post("/scrape", async (req, res) => {
     vertical,
     count,
     scriptUrl,
-    proxyIp
+    proxyIp.ip
   );
 
   res.send({ msg: "success", link });
+});
+
+app.get("/proxies", async (req, res) => {
+  let proxyIp = await pickProxiesIp();
+  db.push("/ip", proxyIp);
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

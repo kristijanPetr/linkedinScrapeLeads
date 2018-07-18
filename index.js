@@ -189,41 +189,25 @@ const getMapsPlacesLocation = async (
     let domain = website.match(".*://?([^/]+)")
       ? website.match(".*://?([^/]+)")[1]
       : `${filteredName.replace(" ", "")}.com`;
-    if (domain) {
-      let emailResp = await getEmailsFromDomain({
-        fullName: name,
-        domain
-      });
-      if (emailResp && !emailResp.email) {
-        emailResp = await getEmailsFromDomain({
-          fullName: filteredName,
-          domain
-        });
-      } else {
-        emailResp = {
-          email: ""
-        };
-      }
-      let crawlEmail = await scrapeEmailFromDomain(website || domain);
-      let permutateEmails =
-        (await emailPermutator(splitted[0], splitted[1], domain)) || [];
-      let emails = [
-        ...[
-          name,
-          splitted[0],
-          splitted[1],
-          link.link,
-          website,
-          filteredName,
-          emailResp ? emailResp.email : "",
-          await asyncEmailSecondChecker(emailResp),
-          await checkEmailIfExist(emailResp),
-          crawlEmail
-        ],
-        ...permutateEmails
-      ];
-      emailLeads.push(emails);
-    }
+
+    let crawlEmail = await scrapeEmailFromDomain(website || domain);
+    let permutateEmails =
+      (await emailPermutator(splitted[0], splitted[1], domain)) || [];
+    let emails = [
+      ...[
+        name,
+        splitted[0],
+        splitted[1],
+        link.link,
+        website,
+        filteredName,
+        crawlEmail,
+        await asyncEmailSecondChecker(crawlEmail),
+        await checkEmailIfExist(crawlEmail)
+      ],
+      ...permutateEmails
+    ];
+    emailLeads.push(emails);
   }
   await postDataToAppsScript(scriptUrl, placesArr, "places");
   await postDataToAppsScript(scriptUrl, emailLeads, "emails");
@@ -289,52 +273,6 @@ function verifierEmailsFromHunter(email) {
       deliver: false,
       score: 0
     }));
-}
-
-function getEmailsFromDomain(personData, count = 0) {
-  let { fullName = " ", domain } = personData;
-
-  let queryParam = `domain=${domain}&full_name=${stripSpecalChar(fullName)
-    .split(" ")
-    .join("+")}`;
-  let url = `https://api.hunter.io/v2/email-finder?api_key=4847b3fd2f53da802f5346ac0268428dfcd19355&${queryParam}`;
-
-  return axios
-    .get(url)
-    .then(response => {
-      let { data } = response.data;
-      if (!data.email) {
-        let newName = stripSpecalChar(fullName)
-          .split(" ")
-          .filter(item => item.length > 3);
-        if (newName.length > 2) {
-          newName.pop();
-          return getEmailsFromDomain(
-            {
-              domain,
-              fullName: newName.join(" ")
-            },
-            count
-          );
-        }
-      }
-      return data;
-    })
-    .catch(err => {
-      console.log("LINE 328", domain);
-      console.log(err.message);
-      count = count + 1;
-      let newName = stripSpecalChar(fullName)
-        .split(" ")
-        .filter(item => item.length > 2);
-      if (newName.length > 2) {
-        newName.pop();
-        return getEmailsFromDomain({
-          domain,
-          fullName: newName.join(" ")
-        });
-      }
-    });
 }
 
 async function asyncEmailSecondChecker(email) {
