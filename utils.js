@@ -1,4 +1,4 @@
-module.exports.toLowerCamel = inputStr => {
+const inputStr = inputStr => {
   return inputStr
     .replace(/[\s_-]+/g, " ")
     .trim()
@@ -15,4 +15,24 @@ module.exports.toLowerCamel = inputStr => {
         .join("");
     })
     .join("");
+};
+
+const axios = require("axios");
+
+const axiosProxyRequest = url => {
+  return axios.get(url, {
+    proxy: {
+      host: "fr.proxymesh.com",
+      port: 31280,
+      auth: {
+        username: "tealeaf",
+        password: "eTjiELVQeA8HNPXBweWGdpdD"
+      }
+    }
+  });
+};
+
+module.exports = {
+  toLowerCamel: inputStr,
+  axiosProxyRequest
 };

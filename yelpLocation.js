@@ -13,7 +13,6 @@ function getPlacesYelp(name, location) {
     .then(res => {
       if (res.jsonBody.businesses.length > 0) {
         let results = res.jsonBody.businesses[0].location.display_address;
-        console.log(results);
         return results;
       } else {
         return false;

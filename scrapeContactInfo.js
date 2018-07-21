@@ -7,6 +7,7 @@ async function emailCrawler(website) {
   return await emailscraper
     .getLevels(2)
     .then(async emails => {
+      console.log("EMAIL CRAWLER: ", emails);
       return emails.length > 0 ? emails.join(",") : "";
     })
     .catch(e => {

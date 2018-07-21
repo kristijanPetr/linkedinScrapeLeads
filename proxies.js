@@ -1,15 +1,6 @@
 const axios = require("axios");
 const scrapeIt = require("scrape-it");
 
-async function getProxysFromUrl() {
-  return await axios.get("https://proxy.l337.tech/txt").then(resp => {
-    let respData = resp.data.split("\n");
-    respData = respData.filter(v => v != "");
-    console.log(respData);
-    return respData;
-  });
-}
-
 async function pickProxiesIp() {
   const proxylist = require("proxylist");
   return await proxylist.main().then(async list => {

@@ -159,6 +159,7 @@ const getMapsPlacesLocation = async (
 
     if (!placeData) {
       let yelpAddress = await getLocationYelp(filteredName, location);
+
       if (!yelpAddress) continue;
       placeData = await getGooglePlaceInfo(
         "" + filteredName + ", " + vertical + ", " + yelpAddress + "",
@@ -242,52 +243,13 @@ function verifierEmailsFromKickBox(email) {
     }));
 }
 
-function verifierEmailsFromHunter(email) {
-  let urlVerifierHunter = `https://api.hunter.io/v2/email-verifier?email=${email}&api_key=4847b3fd2f53da802f5346ac0268428dfcd19355`;
-  return axios
-    .get(urlVerifierHunter)
-    .then(response => {
-      if (response.status === 200) {
-        if (response.data.data.score > 80) {
-          return {
-            email,
-            deliver: true,
-            score: response.data.data.score
-          };
-        } else {
-          return {
-            email,
-            deliver: false,
-            score: response.data.data.score
-          };
-        }
-      }
-      return {
-        email,
-        deliver: false,
-        score: 0
-      };
-    })
-    .catch(err => ({
-      email,
-      deliver: false,
-      score: 0
-    }));
-}
-
 async function asyncEmailSecondChecker(email) {
   let deliver = false;
-  let checkerHunter = await verifierEmailsFromHunter(email);
-  if (!checkerHunter.deliver) {
-    let checkerKickBox = await verifierEmailsFromKickBox(email);
-    if (checkerKickBox.deliver) {
-      deliver = true;
-      return deliver;
-    } else {
-      return deliver;
-    }
-  } else {
+  let checkerKickBox = await verifierEmailsFromKickBox(email);
+  if (checkerKickBox.deliver) {
     deliver = true;
+    return deliver;
+  } else {
     return deliver;
   }
 }

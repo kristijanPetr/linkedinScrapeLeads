@@ -1,6 +1,7 @@
 const scrapeIt = require("scrape-it");
 const axios = require("axios");
 const { postDataToAppsScript, getMapsPlacesLocation } = require("./index");
+const { axiosProxyRequest } = require("./utils");
 
 // Promise interface
 async function scrapeData(
@@ -12,10 +13,7 @@ async function scrapeData(
   scriptUrl,
   proxyIp
 ) {
-  let html = await axios
-    .get(link, {
-      proxy: { host: proxyIp.split(":")[0], port: proxyIp.split(":")[1] }
-    })
+  let html = await axiosProxyRequest(link)
     .then(async resp => {
       let html = resp.data;
       // console.log("AXIOS HTML", html);
