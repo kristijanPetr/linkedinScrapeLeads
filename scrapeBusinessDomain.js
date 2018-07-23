@@ -24,7 +24,18 @@ function getBusinessDomain(link) {
         }
       });
 
-      let results = data.articles[0].name;
+      let results = "http://" + data.articles[0].name;
+      if (results.indexOf("…") > -1) {
+        if (results.indexOf(".…") > -1) {
+          let replacedResultsFourth = results.replace(/.…$/, ".com");
+          console.log("REPLACED RESULTS ", replacedResultsFourth);
+          return replacedResultsFourth;
+        }
+        let replacedResultsThree = results.replace(/…$/, ".com");
+        console.log("REPLACED RESULTS ", replacedResultsThree);
+        return replacedResultsThree;
+      }
+
       console.log("RESULTS URL", results);
       return results;
     })

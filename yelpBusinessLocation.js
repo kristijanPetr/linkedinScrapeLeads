@@ -34,23 +34,24 @@ async function getBusinessData(term, location, scriptUrl) {
           console.log("ELEMENT: ", element);
 
           let bussinesDomain = await getBusinessDomain(element);
-          
-          let emailBussines = await scrapeEmailFromDomain(
-            "http://" + bussinesDomain
-          );
+
+          let emailBussines = await scrapeEmailFromDomain(bussinesDomain);
 
           console.log("BUSSINES DOMAIN: ", bussinesDomain);
+
           console.log("EMAILBUSSINESS ", emailBussines);
 
           let locations = [bussinesDomain, emailBussines, element];
           locationsArray.push(locations);
-          await postDataToAppsScript(scriptUrl, locationsArray, "locations");
         }
+
         if (totalRes > offset) {
           offset += 50;
         } else {
           flag = false;
         }
+
+        await postDataToAppsScript(scriptUrl, locationsArray, "locations");
       })
       .catch(e => {
         console.log(e);

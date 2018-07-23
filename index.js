@@ -4,6 +4,7 @@ const { scrapeEmailFromDomain } = require("./scrapeContactInfo");
 const { emailPermutator } = require("./permutate");
 const emailCheck = require("email-check");
 const { getLocationYelp } = require("./yelpLocation");
+const {searchPlaces,placeInfo} = require("./googlePlaceUtils");
 
 function getGooglePlaceInfo(query, param, keys) {
   const key = keys[0];
