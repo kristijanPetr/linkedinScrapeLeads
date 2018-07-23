@@ -1,3 +1,5 @@
+const axioshttps = require("axios-https-proxy-fix");
+
 const inputStr = inputStr => {
   return inputStr
     .replace(/[\s_-]+/g, " ")
@@ -17,12 +19,10 @@ const inputStr = inputStr => {
     .join("");
 };
 
-const axios = require("axios");
-
 const axiosProxyRequest = url => {
-  return axios.get(url, {
+  return axioshttps.get(url, {
     proxy: {
-      host: "fr.proxymesh.com",
+      host: "us-wa.proxymesh.com",
       port: 31280,
       auth: {
         username: "tealeaf",

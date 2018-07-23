@@ -1,18 +1,8 @@
 const scrapeIt = require("scrape-it");
-const axioshttps = require("axios-https-proxy-fix");
-
-const proxy = {
-  host: "fr.proxymesh.com",
-  port: 31280,
-  auth: {
-    username: "tealeaf",
-    password: "eTjiELVQeA8HNPXBweWGdpdD"
-  }
-};
+const { axiosProxyRequest } = require("./utils");
 
 function getBusinessDomain(link) {
-  return axioshttps
-    .get(link, { proxy })
+  return axiosProxyRequest(link)
     .then(resp => {
       let html = resp.data;
       let data = scrapeIt.scrapeHTML(html, {

@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/maps": "^0.5.5",
     "axios": "^0.18.0",
     "axios-https-proxy-fix": "^0.17.1",
     "body-parser": "^1.18.3",

@@ -47,7 +47,7 @@ app.post("/scrape", async (req, res) => {
 });
 
 app.post("/bussines", async (req, res) => {
-  const { location, scriptUrl, term } = req.body;
+  const { location, scriptUrl, term } = req.body; // zipcode
 
   let locationResults = await getBusinessData(term, location, scriptUrl);
 
