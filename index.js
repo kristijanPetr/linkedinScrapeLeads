@@ -1,10 +1,9 @@
 const axios = require("axios");
-//const { toLowerCamel } = require("./utils");
 const { scrapeEmailFromDomain } = require("./scrapeContactInfo");
 const { emailPermutator } = require("./permutate");
-//const emailCheck = require("email-check");
 const { getLocationYelp } = require("./yelpLocation");
 const { searchPlaces, placeInfo } = require("./googlePlaceUtils");
+const { bulkEmailChecker } = require("./bulkEmailChecker");
 
 const getMapsPlacesLocation = async (
   linkedinData,
@@ -77,6 +76,9 @@ const getMapsPlacesLocation = async (
       : `${filteredName.replace(" ", "")}.com`;
 
     let crawlEmail = await scrapeEmailFromDomain(website || domain);
+
+    //let firstEmail = crawlEmail.split(",")[0];
+
     let permutateEmails =
       (await emailPermutator(splitted[0], splitted[1], domain)) || [];
     let emails = [
@@ -88,8 +90,7 @@ const getMapsPlacesLocation = async (
         website,
         filteredName,
         crawlEmail
-        //await asyncEmailSecondChecker(crawlEmail),
-        //await checkEmailIfExist(crawlEmail)
+        //await bulkEmailChecker(firstEmail) BULK EMAIL CHECKER
       ],
       ...permutateEmails
     ];
@@ -110,7 +111,7 @@ const postDataToAppsScript = async (
     .then(resp => {
       return resp.data;
     })
-    .catch(err => console.log(resp));
+    .catch(err => console.log(err));
 };
 
 function stripSpecalChar(str) {

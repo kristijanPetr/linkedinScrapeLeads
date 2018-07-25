@@ -2,11 +2,9 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const { scraper } = require("./scraper");
-const { pickProxiesIp } = require("./proxies");
+const { getBusinessByZipCode } = require("./searchByZipCodes");
 const { getBusinessData } = require("./yelpBusinessLocation");
 let RateLimit = require("express-rate-limit");
-const JsonDB = require("node-json-db");
-const db = new JsonDB("myDataBase", true, false);
 
 const PORT = 4000;
 /**
@@ -47,17 +45,32 @@ app.post("/scrape", async (req, res) => {
 });
 
 app.post("/bussines", async (req, res) => {
-  const { location, scriptUrl, term } = req.body; // zipcode
+  const { location, scriptUrl, term } = req.body;
+
+  if (!location || !scriptUrl || !term) {
+    return res.status(401).send({ msg: "Not enough parametars." });
+  }
 
   let locationResults = await getBusinessData(term, location, scriptUrl);
 
   res.send({ msg: "success", location, term });
 });
 
-// app.get("/proxies", async (req, res) => {
-//   let proxyIp = await pickProxiesIp();
-//   db.push("/ip", proxyIp);
-// });
+app.post("/zipCodeSearch", async (req, res) => {
+  const { country, scriptUrl, vertical } = req.body; // zipcode
+
+  if (!country || !vertical || !scriptUrl) {
+    return res.status(401).send({ msg: "Not enough parametars." });
+  }
+
+  let zipCodesBussines = await getBusinessByZipCode(
+    country,
+    vertical,
+    scriptUrl
+  );
+
+  res.send({ msg: "success", country, vertical });
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 

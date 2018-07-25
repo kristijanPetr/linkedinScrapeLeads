@@ -27,7 +27,8 @@
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
     "scrape-it": "^5.0.5",
-    "yelp-fusion": "^2.0.3"
+    "yelp-fusion": "^2.0.3",
+    "zipcodes": "^6.0.1"
   },
   "devDependencies": {
     "nodemon": "^1.18.3"
