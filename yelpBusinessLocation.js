@@ -5,6 +5,7 @@ let { getBusinessDomain } = require("./scrapeBusinessDomain");
 let { scrapeEmailFromDomain } = require("./scrapeContactInfo");
 const client = yelp.client(apiKey);
 let { postDataToAppsScript } = require("./index");
+const { fbYelp } = require("./firebase");
 
 async function getBusinessData(term, location, scriptUrl) {
   let offset = 0;
@@ -33,15 +34,23 @@ async function getBusinessData(term, location, scriptUrl) {
           const element = filtered[i];
           console.log("ELEMENT: ", element);
 
-          let bussinesDomain = await getBusinessDomain(element);
+          let bussinesDomain = (await getBusinessDomain(element)) || "";
 
-          let emailBussines = await scrapeEmailFromDomain(bussinesDomain);
+          let emailBussines =
+            (await scrapeEmailFromDomain(bussinesDomain)) || "";
 
           console.log("BUSSINES DOMAIN: ", bussinesDomain);
 
           console.log("EMAILBUSSINESS ", emailBussines);
 
-          let locations = [bussinesDomain, emailBussines, element];
+          let locations = [
+            term,
+            location,
+            bussinesDomain,
+            emailBussines,
+            element
+          ];
+          //fbYelp.push({ ...locations });
           locationsArray.push(locations);
         }
 

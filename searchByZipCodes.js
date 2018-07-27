@@ -3,6 +3,7 @@ const { searchPlaces, placeInfo } = require("./googlePlaceUtils");
 const { scrapeEmailFromDomain } = require("./scrapeContactInfo");
 const { postDataToAppsScript } = require("./index");
 const { bulkEmailChecker } = require("./bulkEmailChecker");
+const { fbZip } = require("./firebase");
 
 async function getBusinessByZipCode(country, vertical, scriptUrl) {
   let dataArr = [];
@@ -26,6 +27,10 @@ async function getBusinessByZipCode(country, vertical, scriptUrl) {
         //let emailVerif = await bulkEmailChecker(firstEmail); BULK EMAIL CHECKER
         let data = [placeAddress, placeWebsite, email]; //emailVerif];
         dataArr.push(data);
+        // if (placeWebsite && typeof placeWebsite === "string") {
+          
+        //   fbZip.push({ vertical, country, ...data });
+        // }
 
         console.log("EMAILS", email);
       }

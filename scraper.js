@@ -2,6 +2,7 @@ const scrapeIt = require("scrape-it");
 //const axios = require("axios");
 const { postDataToAppsScript, getMapsPlacesLocation } = require("./index");
 const { axiosProxyRequest } = require("./utils");
+const { fbLinkedinUsers } = require("./firebase");
 
 // Promise interface
 async function scrapeData(
@@ -61,6 +62,8 @@ async function scrapeData(
       //.then(async ({ data, response }) => {
 
       let newData = [...results, ...data.articles];
+
+      //data.articles.map(article => fbLinkedinUsers.push({ ...article }));
       console.log("NEXT PAGE DATA ", data.nextPage, link);
 
       let countNextPage = data.nextPage

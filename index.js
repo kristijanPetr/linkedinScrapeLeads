@@ -4,6 +4,7 @@ const { emailPermutator } = require("./permutate");
 const { getLocationYelp } = require("./yelpLocation");
 const { searchPlaces, placeInfo } = require("./googlePlaceUtils");
 const { bulkEmailChecker } = require("./bulkEmailChecker");
+const { fbEmails, fbPlaces } = require("./firebase");
 
 const getMapsPlacesLocation = async (
   linkedinData,
@@ -15,6 +16,7 @@ const getMapsPlacesLocation = async (
   let emailLeads = [];
   for (let i = 0; i < linkedinData.length; i++) {
     let link = linkedinData[i];
+    //  fbLinkedinUsers.push(link)
     let splitted = stripSpecalChar(link.name)
       .split(" ")
       .filter(item => item.length > 2);
@@ -60,7 +62,15 @@ const getMapsPlacesLocation = async (
     let { vicinity, name, website = "", rating = "" } = placeIdInfo;
 
     console.log("ADDRESS PLACEINFO", placeIdInfo.vicinity);
-
+    // fbPlaces.push({
+    //   name,
+    //   firstName: splitted[0],
+    //   lastName: splitted[1],
+    //   link: link.link,
+    //   vicinity,
+    //   website,
+    //   rating
+    // });
     placesArr.push([
       name,
       splitted[0],
@@ -78,6 +88,10 @@ const getMapsPlacesLocation = async (
     let crawlEmail = await scrapeEmailFromDomain(website || domain);
 
     //let firstEmail = crawlEmail.split(",")[0];
+
+    // fbEmails.push({
+    //   crawlEmail
+    // });
 
     let permutateEmails =
       (await emailPermutator(splitted[0], splitted[1], domain)) || [];
@@ -97,6 +111,7 @@ const getMapsPlacesLocation = async (
     emailLeads.push(emails);
   }
   await postDataToAppsScript(scriptUrl, placesArr, "places");
+
   await postDataToAppsScript(scriptUrl, emailLeads, "emails");
 };
 

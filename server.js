@@ -6,20 +6,21 @@ const { getBusinessByZipCode } = require("./searchByZipCodes");
 const { getBusinessData } = require("./yelpBusinessLocation");
 let RateLimit = require("express-rate-limit");
 
+
 const PORT = 4000;
 /**
  * Get port from environment and store in Express.
  */
 let port = normalizePort(process.env.PORT || PORT);
-let limiter = new RateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 1, // limit each IP to 1 requests per windowMs
-  delayMs: 0 // disable delaying - full speed until the max limit is reached
-});
+// let limiter = new RateLimit({
+//   windowMs: 1 * 60 * 1000, // 1 minute
+//   max: 1, // limit each IP to 1 requests per windowMs
+//   delayMs: 0 // disable delaying - full speed until the max limit is reached
+// });
 
 app.use(bodyParser.json());
 //  apply to all requests
-app.use("/scrape", limiter);
+//app.use("/scrape", limiter);
 
 let proxyIp = require("./myDataBase.json");
 
