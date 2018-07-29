@@ -77,6 +77,7 @@ app.post("/validatemails", async (req, res) => {
   let { rawEmails, scriptUrl } = req.body;
   console.log(rawEmails);
   validateRawEmails(scriptUrl, rawEmails);
+  res.send({ msg: "success" });
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
