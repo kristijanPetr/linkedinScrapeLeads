@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const { scraper } = require("./scraper");
 const { getBusinessByZipCode } = require("./searchByZipCodes");
 const { getBusinessData } = require("./yelpBusinessLocation");
+const { validateRawEmails } = require("./bulkEmailChecker");
 let RateLimit = require("express-rate-limit");
 
 const PORT = 4000;
@@ -70,6 +71,12 @@ app.post("/zipCodeSearch", async (req, res) => {
   );
 
   res.send({ msg: "success", country, vertical });
+});
+
+app.post("/validatemails", async (req, res) => {
+  let { rawEmails, scriptUrl } = req.body;
+  console.log(rawEmails);
+  validateRawEmails(scriptUrl, rawEmails);
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

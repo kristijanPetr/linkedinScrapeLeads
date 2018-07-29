@@ -11,8 +11,14 @@ async function emailCrawler(website) {
       console.log("EMAIL CRAWLER: ", emails);
       await postDataToAppsScript(
         "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
-        [emails.map(el => [el])],
-        "verifiedEmails"
+        emails
+          .filter(el => {
+            if (el.length < 50) {
+              return true;
+            }
+          })
+          .map(el => [el]),
+        "rawEmails" //"rawEmails"
       );
       return emails.length > 0 ? emails.join(",") : "";
     })

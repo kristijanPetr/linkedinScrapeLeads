@@ -238,24 +238,22 @@ const emailPermutator = async (
   return finalPermutations.sort();
 };
 
-async function passedEmails(
-  finalPermutations = ["petrovski.k@gmail.com", "testingkp112@gmail.com"]
-) {
+async function passedEmails(finalPermutations) {
+  console.log("Final Permutations",finalPermutations)
   let passedEmailsArr = [];
   for (let i = 0; i < finalPermutations.length; i++) {
-    let verifyEmails = (await bulkEmailChecker(finalPermutations[i])) || "";
-    if (verifyEmails === "passed") {
-      passedEmailsArr.push([finalPermutations[i]]);
-    }
+    // let verifyEmails = (await bulkEmailChecker(finalPermutations[i])) || "";
+    // if (verifyEmails === "passed") {
+    //   passedEmailsArr.push([finalPermutations[i]]);
+    // }
   }
-  if (passedEmailsArr.length > 0) {
+  if (finalPermutations.length > 0) {
     await postDataToAppsScript(
       "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
-      passedEmailsArr,
-      "verifiedEmails"
+      finalPermutations.map(el => [el]),
+      "rawEmails" // "rawEmails"
     );
   }
-  //let passEmail = verifyEmails.map(el => el === "passed");
 }
 
 module.exports.emailPermutator = emailPermutator;

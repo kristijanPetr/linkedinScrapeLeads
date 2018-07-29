@@ -97,7 +97,7 @@ const getMapsPlacesLocation = async (
     // let pasEmail = [];
     let permutateEmails =
       (await emailPermutator(splitted[0], splitted[1], domain)) || [];
-
+   
     // permutateEmails.forEach(async element => {
     //   let verifyEmails = (await bulkEmailChecker(element)) || "";
 
