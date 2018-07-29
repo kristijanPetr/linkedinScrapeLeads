@@ -18,7 +18,20 @@ let port = normalizePort(process.env.PORT || PORT);
 //   delayMs: 0 // disable delaying - full speed until the max limit is reached
 // });
 
-app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+    limit: "5mb",
+    parameterLimit: 100000
+  })
+);
+app.use(
+  bodyParser.json({
+    limit: "5mb"
+  })
+);
+
+// app.use(bodyParser.json());
 //  apply to all requests
 //app.use("/scrape", limiter);
 
