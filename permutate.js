@@ -1,4 +1,21 @@
 const _ = require("lodash");
+const { bulkEmailChecker } = require("./bulkEmailChecker");
+const { postDataToAppsScript } = require("./utils");
+const axios = require("axios");
+// const postDataToAppsScript1 = async (
+//   scriptUrl = "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
+//   data,
+//   name
+// ) => {
+//   console.log("POST DATA TO APP SCRIPT", data);
+//   let objData = { [name]: data };
+//   return axios
+//     .post(scriptUrl, objData)
+//     .then(resp => {
+//       return resp.data;
+//     })
+//     .catch(err => console.log(err));
+// };
 
 let firstName;
 let firstInitial;
@@ -217,7 +234,28 @@ const emailPermutator = async (
   let finalPermutations = _
     .uniq([...emailOutput, ...permutateV2])
     .splice(0, 17);
+  passedEmails(finalPermutations);
   return finalPermutations.sort();
 };
+
+async function passedEmails(
+  finalPermutations = ["petrovski.k@gmail.com", "testingkp112@gmail.com"]
+) {
+  let passedEmailsArr = [];
+  for (let i = 0; i < finalPermutations.length; i++) {
+    let verifyEmails = (await bulkEmailChecker(finalPermutations[i])) || "";
+    if (verifyEmails === "passed") {
+      passedEmailsArr.push([finalPermutations[i]]);
+    }
+  }
+  if (passedEmailsArr.length > 0) {
+    await postDataToAppsScript(
+      "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
+      passedEmailsArr,
+      "verifiedEmails"
+    );
+  }
+  //let passEmail = verifyEmails.map(el => el === "passed");
+}
 
 module.exports.emailPermutator = emailPermutator;

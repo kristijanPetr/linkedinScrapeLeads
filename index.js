@@ -5,6 +5,7 @@ const { getLocationYelp } = require("./yelpLocation");
 const { searchPlaces, placeInfo } = require("./googlePlaceUtils");
 const { bulkEmailChecker } = require("./bulkEmailChecker");
 const { fbEmails, fbPlaces } = require("./firebase");
+const { postDataToAppsScript } = require("./utils");
 
 const getMapsPlacesLocation = async (
   linkedinData,
@@ -87,14 +88,27 @@ const getMapsPlacesLocation = async (
 
     let crawlEmail = await scrapeEmailFromDomain(website || domain);
 
-    let firstEmail = crawlEmail.split(",")[0];
+    //let firstEmail = crawlEmail.split(",")[0];
 
     // fbEmails.push({
     //   crawlEmail
     // });
-
+    // let passedEmails = [];
+    // let pasEmail = [];
     let permutateEmails =
       (await emailPermutator(splitted[0], splitted[1], domain)) || [];
+
+    // permutateEmails.forEach(async element => {
+    //   let verifyEmails = (await bulkEmailChecker(element)) || "";
+
+    //   passedEmails.push(verifyEmails);
+    //   let passEmail = passedEmails.map(el => el === "passed");
+    //   pasEmail.push(passEmail);
+
+    //   console.log("EMAILS FROM PERMUTATIONS VERIFIED", passEmail);
+    //   //await postDataToAppsScript(scriptUrl, passEmail, "verifiedEmails");
+    // });
+
     let emails = [
       ...[
         name,
@@ -103,8 +117,7 @@ const getMapsPlacesLocation = async (
         link.link,
         website,
         filteredName,
-        crawlEmail,
-        await bulkEmailChecker(firstEmail) // BULK EMAIL CHECKER
+        crawlEmail
       ],
       ...permutateEmails
     ];
@@ -115,26 +128,27 @@ const getMapsPlacesLocation = async (
   await postDataToAppsScript(scriptUrl, emailLeads, "emails");
 };
 
-const postDataToAppsScript = async (
-  scriptUrl = "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
-  data,
-  name
-) => {
-  let objData = { [name]: data };
-  return axios
-    .post(scriptUrl, objData)
-    .then(resp => {
-      return resp.data;
-    })
-    .catch(err => console.log(err));
-};
+// const postDataToAppsScript = async (
+//   scriptUrl = "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
+//   data,
+//   name
+// ) => {
+//   console.log("POST DATA TO APP SCRIPT", data);
+//   let objData = { [name]: data };
+//   return axios
+//     .post(scriptUrl, objData)
+//     .then(resp => {
+//       return resp.data;
+//     })
+//     .catch(err => console.log(err));
+// };
 
 function stripSpecalChar(str) {
   return str.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, " ");
 }
 
 module.exports = {
-  postDataToAppsScript,
+  //postDataToAppsScript,
   getMapsPlacesLocation
 };
 

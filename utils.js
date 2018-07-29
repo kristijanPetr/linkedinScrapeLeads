@@ -1,4 +1,5 @@
 const axioshttps = require("axios-https-proxy-fix");
+const axios = require("axios");
 
 const inputStr = inputStr => {
   return inputStr
@@ -32,7 +33,23 @@ const axiosProxyRequest = url => {
   });
 };
 
+const postDataToAppsScript = async (
+  scriptUrl = "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
+  data,
+  name
+) => {
+  console.log("POST DATA TO APP SCRIPT", data);
+  let objData = { [name]: data };
+  return axios
+    .post(scriptUrl, objData)
+    .then(resp => {
+      return resp.data;
+    })
+    .catch(err => console.log(err));
+};
+
 module.exports = {
   toLowerCamel: inputStr,
-  axiosProxyRequest
+  axiosProxyRequest,
+  postDataToAppsScript
 };

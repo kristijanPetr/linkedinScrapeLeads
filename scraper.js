@@ -1,6 +1,7 @@
 const scrapeIt = require("scrape-it");
 //const axios = require("axios");
-const { postDataToAppsScript, getMapsPlacesLocation } = require("./index");
+const { getMapsPlacesLocation } = require("./index");
+const { postDataToAppsScript } = require("./utils");
 const { axiosProxyRequest } = require("./utils");
 const { fbLinkedinUsers } = require("./firebase");
 

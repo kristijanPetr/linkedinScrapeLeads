@@ -4,7 +4,7 @@ const yelp = require("yelp-fusion");
 let { getBusinessDomain } = require("./scrapeBusinessDomain");
 let { scrapeEmailFromDomain } = require("./scrapeContactInfo");
 const client = yelp.client(apiKey);
-let { postDataToAppsScript } = require("./index");
+let { postDataToAppsScript } = require("./utils");
 const { fbYelp } = require("./firebase");
 const { bulkEmailChecker } = require("./bulkEmailChecker");
 

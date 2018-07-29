@@ -1,4 +1,5 @@
 const Scraper = require("email-crawler");
+const { postDataToAppsScript } = require("./utils");
 
 async function emailCrawler(website) {
   let emailscraper = new Scraper(website);
@@ -8,10 +9,15 @@ async function emailCrawler(website) {
     .getLevels(2)
     .then(async emails => {
       console.log("EMAIL CRAWLER: ", emails);
+      await postDataToAppsScript(
+        "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
+        [emails.map(el => [el])],
+        "verifiedEmails"
+      );
       return emails.length > 0 ? emails.join(",") : "";
     })
     .catch(e => {
-      console.log("error");
+      console.log("error", e.message);
       return "";
     });
 }
