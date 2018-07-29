@@ -6,7 +6,6 @@ const { getBusinessByZipCode } = require("./searchByZipCodes");
 const { getBusinessData } = require("./yelpBusinessLocation");
 let RateLimit = require("express-rate-limit");
 
-
 const PORT = 4000;
 /**
  * Get port from environment and store in Express.

@@ -61,7 +61,7 @@ const getMapsPlacesLocation = async (
     // );
     let { vicinity, name, website = "", rating = "" } = placeIdInfo;
 
-    console.log("ADDRESS PLACEINFO", placeIdInfo.vicinity);
+    //console.log("ADDRESS PLACEINFO", placeIdInfo.vicinity);
     // fbPlaces.push({
     //   name,
     //   firstName: splitted[0],
@@ -87,7 +87,7 @@ const getMapsPlacesLocation = async (
 
     let crawlEmail = await scrapeEmailFromDomain(website || domain);
 
-    //let firstEmail = crawlEmail.split(",")[0];
+    let firstEmail = crawlEmail.split(",")[0];
 
     // fbEmails.push({
     //   crawlEmail
@@ -103,8 +103,8 @@ const getMapsPlacesLocation = async (
         link.link,
         website,
         filteredName,
-        crawlEmail
-        //await bulkEmailChecker(firstEmail) BULK EMAIL CHECKER
+        crawlEmail,
+        await bulkEmailChecker(firstEmail) // BULK EMAIL CHECKER
       ],
       ...permutateEmails
     ];

@@ -6,6 +6,7 @@ let { scrapeEmailFromDomain } = require("./scrapeContactInfo");
 const client = yelp.client(apiKey);
 let { postDataToAppsScript } = require("./index");
 const { fbYelp } = require("./firebase");
+const { bulkEmailChecker } = require("./bulkEmailChecker");
 
 async function getBusinessData(term, location, scriptUrl) {
   let offset = 0;
@@ -48,7 +49,8 @@ async function getBusinessData(term, location, scriptUrl) {
             location,
             bussinesDomain,
             emailBussines,
-            element
+            element,
+            await bulkEmailChecker(emailBussines)
           ];
           //fbYelp.push({ ...locations });
           locationsArray.push(locations);
