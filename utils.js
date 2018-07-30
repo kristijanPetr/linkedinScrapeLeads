@@ -1,6 +1,6 @@
 const axioshttps = require("axios-https-proxy-fix");
 const axios = require("axios");
-
+const fs = require("fs");
 const inputStr = inputStr => {
   return inputStr
     .replace(/[\s_-]+/g, " ")
@@ -48,8 +48,46 @@ const postDataToAppsScript = async (
     .catch(err => console.log(err));
 };
 
+let queueRequests = [];
+
+const removeElem = el => {
+  let indexT = queueRequests.indexOf(el);
+  console.log("removing element", queueRequests, queueRequests.indexOf(el), el);
+  if (indexT > -1) {
+    queueRequests.splice(indexT, 1);
+  }
+  return queueRequests;
+};
+
+const writeEmailsToFile = (emails = []) => {
+  return fs.appendFileSync("rawEmails.txt", emails.join("\n") + "\n");
+};
+
+const textDataToArray = () => {
+  return fs
+    .readFileSync("rawEmails.txt")
+    .toString()
+    .split("\n")
+    .filter(onlyUnique);
+};
+
+function onlyUnique(value, index, self) {
+  return self.indexOf(value) === index;
+}
+
+const emptyTextDataFile = () => {
+  try {
+    return fs.unlinkSync("rawEmails.txt");
+  } catch (err) {}
+};
+
 module.exports = {
   toLowerCamel: inputStr,
   axiosProxyRequest,
-  postDataToAppsScript
+  postDataToAppsScript,
+  queueRequests,
+  writeEmailsToFile,
+  textDataToArray,
+  removeElem,
+  emptyTextDataFile
 };

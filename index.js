@@ -3,15 +3,20 @@ const { scrapeEmailFromDomain } = require("./scrapeContactInfo");
 const { emailPermutator } = require("./permutate");
 const { getLocationYelp } = require("./yelpLocation");
 const { searchPlaces, placeInfo } = require("./googlePlaceUtils");
-const { bulkEmailChecker } = require("./bulkEmailChecker");
+const { bulkEmailChecker, validateRawEmails } = require("./bulkEmailChecker");
 const { fbEmails, fbPlaces } = require("./firebase");
-const { postDataToAppsScript } = require("./utils");
+const {
+  postDataToAppsScript,
+  removeElem,
+  textDataToArray
+} = require("./utils");
 
 const getMapsPlacesLocation = async (
   linkedinData,
   inputLocation,
   vertical,
-  scriptUrl
+  scriptUrl,
+  userStartTime
 ) => {
   let placesArr = [];
   let emailLeads = [];
@@ -97,7 +102,7 @@ const getMapsPlacesLocation = async (
     // let pasEmail = [];
     let permutateEmails =
       (await emailPermutator(splitted[0], splitted[1], domain)) || [];
-   
+
     // permutateEmails.forEach(async element => {
     //   let verifyEmails = (await bulkEmailChecker(element)) || "";
 
@@ -126,22 +131,19 @@ const getMapsPlacesLocation = async (
   await postDataToAppsScript(scriptUrl, placesArr, "places");
 
   await postDataToAppsScript(scriptUrl, emailLeads, "emails");
-};
+  //startTime;
+  let queueRequests = removeElem(userStartTime);
+  let isItLastReq = queueRequests.length === 0;
+  console.log("Is it last request? ", isItLastReq, queueRequests);
+  if (isItLastReq) {
+    let rawEmails = textDataToArray();
+    console.log(rawEmails);
+    // Remove File data before Validation
+    validateRawEmails(scriptUrl, rawEmails);
 
-// const postDataToAppsScript = async (
-//   scriptUrl = "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
-//   data,
-//   name
-// ) => {
-//   console.log("POST DATA TO APP SCRIPT", data);
-//   let objData = { [name]: data };
-//   return axios
-//     .post(scriptUrl, objData)
-//     .then(resp => {
-//       return resp.data;
-//     })
-//     .catch(err => console.log(err));
-// };
+    
+  }
+};
 
 function stripSpecalChar(str) {
   return str.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, " ");
@@ -151,104 +153,3 @@ module.exports = {
   //postDataToAppsScript,
   getMapsPlacesLocation
 };
-
-// function getGooglePlacesApiKeys() {
-//   const googlePlacesApiKeys = "AIzaSyAYs45c3mO9TtLZnKtVE4iXgSfwBQB42to";
-//   if (!googlePlacesApiKeys) {
-//     throw "No API keys provided." +
-//       "Go to File -> Project Properties -> Script Properties, then under ther property 'googlePlacesApiKeys'," +
-//       "enter a comma separated list of valid API keys ";
-//   } else {
-//     return googlePlacesApiKeys.trim().split(/\s*,\s*/);
-//   }
-// }
-
-// function verifierEmailsFromKickBox(email) {
-//   let urlVerifierKickBox = `https://api.kickbox.io/v2/verify?email=${email}&apikey=live_ad17a91b2ac8bd529142889dbf713551a167358e7b290dda147119dee789ca1e`;
-//   return axios
-//     .get(urlVerifierKickBox)
-//     .then(response => {
-//       if (response.status === 200 && response.data.result === "deliverable") {
-//         return {
-//           email,
-//           deliver: true,
-//           score: response.data.sendex
-//         };
-//       }
-//       if (
-//         (response.status === 200 && response.data.result === "risky") ||
-//         response.data.result === "undeliverable"
-//       ) {
-//         return {
-//           email,
-//           deliver: false
-//         };
-//       }
-//     })
-//     .catch(err => ({
-//       email,
-//       deliver: false,
-//       score: 0
-//     }));
-// }
-
-// async function asyncEmailSecondChecker(email) {
-//   let deliver = false;
-//   let checkerKickBox = await verifierEmailsFromKickBox(email);
-//   if (checkerKickBox.deliver) {
-//     deliver = true;
-//     return deliver;
-//   } else {
-//     return deliver;
-//   }
-// }
-
-// async function checkEmailIfExist(email) {
-//   return emailCheck(email)
-//     .then(function(res) {
-//       return res;
-//     })
-//     .catch(function(err) {
-//       return false;
-//     });
-// }
-
-// function getGooglePlaceInfo(query, param, keys) {
-//   const key = keys[0];
-//   if (key && query.trim() !== "") {
-//     // Build request URL
-//     const callType = param.toLowerCase() === "query" ? "textsearch" : "details";
-//     const googlePlacesUrl =
-//       "https://maps.googleapis.com/maps/api/place/" + callType + "/json";
-//     const queryString =
-//       "?" + param + "=" + encodeURIComponent(query) + "&key=" + key;
-//     const url = googlePlacesUrl + queryString;
-//     //Make API call
-//     return axios.get(url).then(response => {
-//       if (response.status === 200) {
-//         const data = response.data;
-//         if (data.status === "OK") {
-//           //If success, return location info for first match
-//           let place =
-//             param.toLowerCase() === "query" ? data.results[0] : data.result;
-//           return {
-//             placeId: place.place_id || "",
-//             name: place.name || "",
-//             address: buildAddressFromComponents(place) || "",
-//             lat: place.geometry.location.lat || "",
-//             lng: place.geometry.location.lng || "",
-//             rating: place.rating,
-//             website: place.website
-//           };
-//         } else if (data.status == "OVER_QUERY_LIMIT") {
-//           if (keys.length === 1) {
-//             throw "All API keys currently over query limit. Add a new key or try again tomorrow.";
-//           } else {
-//             return getGooglePlaceInfo(query, param, keys.slice(1));
-//           }
-//         }
-//       }
-//     });
-//   }
-//   return null;
-// }

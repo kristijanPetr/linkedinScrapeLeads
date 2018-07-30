@@ -1,6 +1,6 @@
 const _ = require("lodash");
 const { bulkEmailChecker } = require("./bulkEmailChecker");
-const { postDataToAppsScript } = require("./utils");
+const { postDataToAppsScript, writeEmailsToFile } = require("./utils");
 const axios = require("axios");
 // const postDataToAppsScript1 = async (
 //   scriptUrl = "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
@@ -239,7 +239,7 @@ const emailPermutator = async (
 };
 
 async function passedEmails(finalPermutations) {
-  console.log("Final Permutations",finalPermutations)
+  console.log("Final Permutations", finalPermutations);
   let passedEmailsArr = [];
   for (let i = 0; i < finalPermutations.length; i++) {
     // let verifyEmails = (await bulkEmailChecker(finalPermutations[i])) || "";
@@ -248,11 +248,12 @@ async function passedEmails(finalPermutations) {
     // }
   }
   if (finalPermutations.length > 0) {
-    await postDataToAppsScript(
-      "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
-      finalPermutations.map(el => [el]),
-      "rawEmails" // "rawEmails"
-    );
+    // await postDataToAppsScript(
+    //   "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
+    //   finalPermutations.map(el => [el]),
+    //   "rawEmails" // "rawEmails"
+    // );
+    await writeEmailsToFile(finalPermutations);
   }
 }
 

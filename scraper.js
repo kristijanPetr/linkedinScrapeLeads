@@ -13,7 +13,8 @@ async function scrapeData(
   vertical = "Development",
   count,
   scriptUrl,
-  proxyIp
+  proxyIp,
+  userStartTime
 ) {
   return await axiosProxyRequest(link)
     //.get(link, { proxy }) //axiosProxyRequest(link) //await axiosProxyRequest(link)
@@ -91,13 +92,20 @@ async function scrapeData(
             vertical,
             count - 1,
             scriptUrl,
-            proxyIp
+            proxyIp,
+            userStartTime
           ),
           2000
         );
       } else {
         await postDataToAppsScript(scriptUrl, results, "linkedin");
-        getMapsPlacesLocation(results, location, vertical, scriptUrl);
+        getMapsPlacesLocation(
+          results,
+          location,
+          vertical,
+          scriptUrl,
+          userStartTime
+        );
         return results;
       }
       return html;

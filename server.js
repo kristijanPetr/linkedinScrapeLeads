@@ -6,6 +6,7 @@ const { getBusinessByZipCode } = require("./searchByZipCodes");
 const { getBusinessData } = require("./yelpBusinessLocation");
 const { validateRawEmails } = require("./bulkEmailChecker");
 let RateLimit = require("express-rate-limit");
+const { queueRequests } = require("./utils");
 
 const PORT = 4000;
 /**
@@ -44,7 +45,10 @@ app.post("/scrape", async (req, res) => {
     return res.status(401).send({ msg: "Not enough parametars." });
   }
   let link = `http://www.bing.com/search?q=${query}&qs=n&first=0`;
-
+  let startTime = new Date().getTime();
+  req.startTime = startTime;
+  queueRequests.push(startTime);
+  console.log("Request Queue", startTime);
   let results = await scraper(
     link,
     [],
@@ -52,7 +56,8 @@ app.post("/scrape", async (req, res) => {
     vertical,
     count,
     scriptUrl,
-    proxyIp.ip
+    proxyIp.ip,
+    startTime
   );
 
   res.send({ msg: "success", link });
