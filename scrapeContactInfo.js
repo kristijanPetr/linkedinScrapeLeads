@@ -1,7 +1,8 @@
 const Scraper = require("email-crawler");
-const { postDataToAppsScript,writeEmailsToFile } = require("./utils");
+const { postDataToAppsScript, writeEmailsToFile } = require("./utils");
 
 async function emailCrawler(website) {
+  website = website.indexOf('://') > 0 ? website : `https://${website}`;
   let emailscraper = new Scraper(website);
 
   // A level is how far removed (in  terms of link clicks) a page is from the root page (only follows same domain routes)
@@ -20,7 +21,7 @@ async function emailCrawler(website) {
       //     .map(el => [el]),
       //   "rawEmails" //"rawEmails"
       // );
-      await writeEmailsToFile(emails)
+      // await writeEmailsToFile(emails)
       return emails.length > 0 ? emails.join(",") : "";
     })
     .catch(e => {
@@ -28,5 +29,7 @@ async function emailCrawler(website) {
       return "";
     });
 }
+
+//  emailCrawler("vargasjewelerstrophieslompoc.com");
 
 module.exports.scrapeEmailFromDomain = emailCrawler; //scrapeEmailFromDomain;
