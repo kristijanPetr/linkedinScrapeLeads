@@ -32,4 +32,33 @@ function getBusinessDomain(link) {
     .catch(err => console.log(err.message));
 }
 
-module.exports = { getBusinessDomain };
+function getFirstLastBusinessName(link) {
+  return axiosProxyRequest(link)
+    .then(resp => {
+      let html = resp.data;
+      let data = scrapeIt.scrapeHTML(html, {
+        articles: {
+          listItem: ".biz-page-header-left",
+          data: {
+            name: "h1"
+          }
+        }
+      });
+
+      let results = (data.articles[0].name || "").split(" ");
+
+      let firstName = results[0];
+      let lastName = results[1];
+
+      console.log(firstName + " " + lastName);
+
+      return firstName + " " + lastName;
+    })
+    .catch(err => console.log(err.message));
+}
+
+// getFirstLastBusinessName(
+//   "https://www.yelp.com/biz/daniel-p-bockmann-dc-austin-3?adjust_creative=Fu-Oesopz-4qQg2W4LNiXQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Fu-Oesopz-4qQg2W4LNiXQ"
+// );
+
+module.exports = { getBusinessDomain, getFirstLastBusinessName };

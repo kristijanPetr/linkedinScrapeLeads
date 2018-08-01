@@ -44,6 +44,7 @@ app.post("/scrape", async (req, res) => {
   if (!query || !vertical || !location || !scriptUrl) {
     return res.status(401).send({ msg: "Not enough parametars." });
   }
+
   let link = `http://www.bing.com/search?q=${query}&qs=n&first=0`;
   let startTime = new Date().getTime();
   req.startTime = startTime;
@@ -59,6 +60,13 @@ app.post("/scrape", async (req, res) => {
     proxyIp.ip,
     startTime
   );
+  // yelp business
+  // let locationResults = getBusinessData(
+  //   vertical,
+  //   location,
+  //   scriptUrl,
+  //   startTime
+  // );
 
   res.send({ msg: "success", link });
 });

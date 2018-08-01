@@ -239,7 +239,7 @@ const emailPermutator = async (
 };
 
 async function passedEmails(finalPermutations) {
-  console.log("Final Permutations", finalPermutations);
+  //console.log("Final Permutations", finalPermutations);
   let passedEmailsArr = [];
   for (let i = 0; i < finalPermutations.length; i++) {
     // let verifyEmails = (await bulkEmailChecker(finalPermutations[i])) || "";
@@ -253,7 +253,7 @@ async function passedEmails(finalPermutations) {
     //   finalPermutations.map(el => [el]),
     //   "rawEmails" // "rawEmails"
     // );
-    await writeEmailsToFile(finalPermutations);
+    //await writeEmailsToFile(finalPermutations);
   }
 }
 

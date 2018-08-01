@@ -4,12 +4,14 @@ const { emailPermutator } = require("./permutate");
 const { getLocationYelp } = require("./yelpLocation");
 const { searchPlaces, placeInfo } = require("./googlePlaceUtils");
 const { bulkEmailChecker, validateRawEmails } = require("./bulkEmailChecker");
-const { fbEmails, fbPlaces } = require("./firebase");
+const { getBusinessData } = require("./yelpBusinessLocation");
+// const { fbEmails, fbPlaces } = require("./firebase");
 const {
   postDataToAppsScript,
   removeElem,
   textDataToArray
 } = require("./utils");
+const { getEmailsFromToofr } = require("./getEmailsFromToofr");
 
 const getMapsPlacesLocation = async (
   linkedinData,
@@ -93,6 +95,12 @@ const getMapsPlacesLocation = async (
 
     let crawlEmail = await scrapeEmailFromDomain(website || domain);
 
+    let emailFromToof = await getEmailsFromToofr(
+      splitted[0],
+      splitted[1],
+      website || domain
+    );
+
     //let firstEmail = crawlEmail.split(",")[0];
 
     // fbEmails.push({
@@ -100,18 +108,18 @@ const getMapsPlacesLocation = async (
     // });
     // let passedEmails = [];
     // let pasEmail = [];
-    let permutateEmails =
-      (await emailPermutator(splitted[0], splitted[1], domain)) || [];
+    // let permutateEmails =
+    //   (await emailPermutator(splitted[0], splitted[1], domain)) || [];
 
     // permutateEmails.forEach(async element => {
     //   let verifyEmails = (await bulkEmailChecker(element)) || "";
 
-    //   passedEmails.push(verifyEmails);
-    //   let passEmail = passedEmails.map(el => el === "passed");
-    //   pasEmail.push(passEmail);
+    //   //   passedEmails.push(verifyEmails);
+    //   //   let passEmail = passedEmails.map(el => el === "passed");
+    //   //   pasEmail.push(passEmail);
 
-    //   console.log("EMAILS FROM PERMUTATIONS VERIFIED", passEmail);
-    //   //await postDataToAppsScript(scriptUrl, passEmail, "verifiedEmails");
+    //   //   console.log("EMAILS FROM PERMUTATIONS VERIFIED", passEmail);
+    //   //   //await postDataToAppsScript(scriptUrl, passEmail, "verifiedEmails");
     // });
 
     let emails = [
@@ -121,10 +129,10 @@ const getMapsPlacesLocation = async (
         splitted[1],
         link.link,
         website,
-        filteredName,
-        crawlEmail
-      ],
-      ...permutateEmails
+        filteredName
+        //crawlEmail
+      ]
+      //...permutateEmails
     ];
     emailLeads.push(emails);
   }
@@ -132,16 +140,15 @@ const getMapsPlacesLocation = async (
 
   await postDataToAppsScript(scriptUrl, emailLeads, "emails");
   //startTime;
+  await getBusinessData(vertical,inputLocation, scriptUrl )
   let queueRequests = removeElem(userStartTime);
   let isItLastReq = queueRequests.length === 0;
   console.log("Is it last request? ", isItLastReq, queueRequests);
   if (isItLastReq) {
     let rawEmails = textDataToArray();
-    console.log(rawEmails);
+    //console.log(rawEmails);
     // Remove File data before Validation
     validateRawEmails(scriptUrl, rawEmails);
-
-    
   }
 };
 

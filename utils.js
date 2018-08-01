@@ -38,7 +38,7 @@ const postDataToAppsScript = async (
   data,
   name
 ) => {
-  console.log("POST DATA TO APP SCRIPT", data);
+  //console.log("POST DATA TO APP SCRIPT", data);
   let objData = { [name]: data };
   return axios
     .post(scriptUrl, objData)
