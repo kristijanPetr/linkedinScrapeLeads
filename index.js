@@ -9,7 +9,8 @@ const { getBusinessData } = require("./yelpBusinessLocation");
 const {
   postDataToAppsScript,
   removeElem,
-  textDataToArray
+  textDataToArray,
+  emptyTextDataFile
 } = require("./utils");
 const { getEmailsFromToofr } = require("./getEmailsFromToofr");
 
@@ -140,15 +141,23 @@ const getMapsPlacesLocation = async (
 
   await postDataToAppsScript(scriptUrl, emailLeads, "emails");
   //startTime;
-  await getBusinessData(vertical,inputLocation, scriptUrl )
+  await getBusinessData(vertical, inputLocation, scriptUrl);
   let queueRequests = removeElem(userStartTime);
   let isItLastReq = queueRequests.length === 0;
   console.log("Is it last request? ", isItLastReq, queueRequests);
   if (isItLastReq) {
     let rawEmails = textDataToArray();
     //console.log(rawEmails);
+    console.log("PROCESS FINISHED");
     // Remove File data before Validation
-    validateRawEmails(scriptUrl, rawEmails);
+    //emptyTextDataFile();
+    //validateRawEmails(scriptUrl, rawEmails);
+
+    await postDataToAppsScript(
+      "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
+      textDataToArray().map(item => [item]),
+      "verifiedEmails"
+    );
   }
 };
 

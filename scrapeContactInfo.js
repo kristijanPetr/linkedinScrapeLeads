@@ -9,8 +9,9 @@ async function emailCrawler(website) {
   console.log("Website", website);
   //await fs.appendFileSync("websites.txt", website + "\n");
   // A level is how far removed (in  terms of link clicks) a page is from the root page (only follows same domain routes)
-  return await emailscraper
-    .getLevels(2)
+  return "";
+  return emailscraper
+    .getLevels(2, 5000)
     .then(async emails => {
       console.log("EMAIL CRAWLER: ", emails);
       // await postDataToAppsScript(

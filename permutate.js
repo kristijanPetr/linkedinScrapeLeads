@@ -242,10 +242,10 @@ async function passedEmails(finalPermutations) {
   //console.log("Final Permutations", finalPermutations);
   let passedEmailsArr = [];
   for (let i = 0; i < finalPermutations.length; i++) {
-    // let verifyEmails = (await bulkEmailChecker(finalPermutations[i])) || "";
-    // if (verifyEmails === "passed") {
-    //   passedEmailsArr.push([finalPermutations[i]]);
-    // }
+    let verifyEmails = (await bulkEmailChecker(finalPermutations[i])) || "";
+    if (verifyEmails === "passed") {
+      passedEmailsArr.push([finalPermutations[i]]);
+    }
   }
   if (finalPermutations.length > 0) {
     // await postDataToAppsScript(
@@ -253,7 +253,7 @@ async function passedEmails(finalPermutations) {
     //   finalPermutations.map(el => [el]),
     //   "rawEmails" // "rawEmails"
     // );
-    //await writeEmailsToFile(finalPermutations);
+    await writeEmailsToFile(finalPermutations);
   }
 }
 

@@ -60,13 +60,13 @@ async function scrapeData(
           convert: x => (x.includes("Of") ? x.split("Of")[1] : x)
         }
       });
-      console.log("DATA FROM LINKEDIN", data);
+      // console.log("DATA FROM LINKEDIN", data);
       //.then(async ({ data, response }) => {
 
       let newData = [...results, ...data.articles];
 
       //data.articles.map(article => fbLinkedinUsers.push({ ...article }));
-      console.log("NEXT PAGE DATA ", data.nextPage, link);
+      // console.log("NEXT PAGE DATA ", data.nextPage, link);
 
       let countNextPage = data.nextPage
         ? data.nextPage

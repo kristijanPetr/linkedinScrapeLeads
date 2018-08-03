@@ -91,3 +91,6 @@ module.exports = {
   removeElem,
   emptyTextDataFile
 };
+
+
+//console.log(textDataToArray())

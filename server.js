@@ -84,13 +84,14 @@ app.post("/bussines", async (req, res) => {
 });
 
 app.post("/zipCodeSearch", async (req, res) => {
-  const { country, scriptUrl, vertical } = req.body; // zipcode
+  const { city, country, vertical, scriptUrl } = req.body; // zipcode
 
-  if (!country || !vertical || !scriptUrl) {
+  if (!city || !country || !vertical || !scriptUrl) {
     return res.status(401).send({ msg: "Not enough parametars." });
   }
 
   let zipCodesBussines = await getBusinessByZipCode(
+    city,
     country,
     vertical,
     scriptUrl
