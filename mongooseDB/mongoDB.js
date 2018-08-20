@@ -1,11 +1,17 @@
 const mongoose = require("mongoose");
 const company = require("./mongoDBController");
-mongoose.Promise = global.Promise;
-mongoose.connect(
-  "mongodb://root:root@mongo-companies.server.pkristijan.xyz:27017/",
+// mongoose.Promise = global.Promise;
+// mongoose.connect(
+//   "mongodb://root:root@mongo-companies.server.pkristijan.xyz:27017/",
 
-  err => console.log(err)
-);
+//   err => {
+//     if(err){
+//       console.log("ERR DB CONNECT",err)
+//       return;
+
+//     }
+//   }
+// );
 const { postDataToAppsScript } = require("../utils");
 var companiesModel = require("./mongoDBModel");
 

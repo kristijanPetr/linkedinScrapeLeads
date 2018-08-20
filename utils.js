@@ -90,8 +90,8 @@ const regexSnippet = async snippet => {
         .split(".")[0]
         .replace(/at|of|CEO|COO|Owner,/g, "");
 
-      let filteredSnippet = newSnippet.replace(/[^a-zA-Z ]/g, "");
-      console.log(filteredSnippet);
+      let filteredSnippet = newSnippet.replace(/[^a-zA-Z ]/g, "")//.replace(/\s/g, ' ');
+      console.log("Filtered Snippet", filteredSnippet);
 
       return filteredSnippet;
     }

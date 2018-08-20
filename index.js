@@ -11,6 +11,8 @@ const { getYelpInfo } = require("./scrapeBusinessDomain");
 const { regexSnippet } = require("./utils");
 const { findPersonFromDb } = require("./mongooseDB/mongoDB");
 // const { fbEmails, fbPlaces } = require("./firebase");
+const { findCompanyGoogle } = require("./scrapeGoogle");
+
 const {
   postDataToAppsScript,
   removeElem,
@@ -44,126 +46,136 @@ const getMapsPlacesLocation = async (
     // let snippetFromReg = await regexSnippet(link.snippet);
     console.log("LOCATION", inputLocation);
     console.log("FIRST NAME ", splitted[0]);
-    let companyFromDb = await findPersonFromDb(splitted[0]);
+    // let companyFromDb = await findPersonFromDb(splitted[0]);
 
-    console.log("COMPANY FROM DB", companyFromDb);
+    // console.log("COMPANY FROM DB", companyFromDb);
 
-    if (companyFromDb) {
-      // console.log("COMPANY FROM DB", companyFromDb);
-      let dbCompanyArr = [];
-      dbCompanyArr.push([
-        companyFromDb.state || "",
-        companyFromDb.country || "",
-        companyFromDb.website || "",
-        companyFromDb.firstName || "",
-        companyFromDb.lastName || "",
-        companyFromDb.email || "",
-        companyFromDb.companyName || "",
-        companyFromDb.description || "",
-        companyFromDb.address || ""
-      ]);
-      if (companyFromDb.email === null || companyFromDb.email === "") {
-        // console.log("GET EMAIL FROM TOOFR DB");
-        let emailFromToofDB = await getEmailsFromToofr(
-          companyFromDb.firstName,
-          companyFromDb.lastName,
-          companyFromDb.website
-        );
-        console.log("GET EMAIL FROM TOOFR DB", emailFromToofDB);
-        emailFromToofDB.forEach(el => {
-          dbCompanyArr.push(el.email + " , " + " | " + el.confidence);
-        });
-      }
-      console.log("dbCompanyarr", dbCompanyArr);
-      postDataToAppsScript(scriptUrl, dbCompanyArr, "databaseRes");
-    } else {
-      let yelloPagesFromSnippet = await scraPeYellowPages(
-        link.snippet,
-        location,
-        vertical
-      );
-      // console.log("yelloPagesFromSnippet", yelloPagesFromSnippet);
-      let yellowPaArr = [];
-      if (yelloPagesFromSnippet !== undefined) {
-        yellowPaArr = [
-          [
-            yelloPagesFromSnippet.email,
-            yelloPagesFromSnippet.companyInfo.title,
-            yelloPagesFromSnippet.companyInfo.website,
-            yelloPagesFromSnippet.companyInfo.link,
-            vertical,
-            location
-            //JSON.stringify(yelloPagesFromSnippet.companyInfo)
-          ]
-        ];
-
-        Company.updateOrInsertCompany(
+    // if (companyFromDb) {
+    //   // console.log("COMPANY FROM DB", companyFromDb);
+    //   let dbCompanyArr = [];
+    //   dbCompanyArr.push([
+    //     companyFromDb.state || "",
+    //     companyFromDb.country || "",
+    //     companyFromDb.website || "",
+    //     companyFromDb.firstName || "",
+    //     companyFromDb.lastName || "",
+    //     companyFromDb.email || "",
+    //     companyFromDb.companyName || "",
+    //     companyFromDb.description || "",
+    //     companyFromDb.address || ""
+    //   ]);
+    //   if (companyFromDb.email === null || companyFromDb.email === "") {
+    //     // console.log("GET EMAIL FROM TOOFR DB");
+    //     let emailFromToofDB = await getEmailsFromToofr(
+    //       companyFromDb.firstName,
+    //       companyFromDb.lastName,
+    //       companyFromDb.website
+    //     );
+    //     console.log("GET EMAIL FROM TOOFR DB", emailFromToofDB);
+    //     emailFromToofDB.forEach(el => {
+    //       dbCompanyArr.push(el.email + " , " + " | " + el.confidence);
+    //     });
+    //   }
+    //   console.log("dbCompanyarr", dbCompanyArr);
+    //   postDataToAppsScript(scriptUrl, dbCompanyArr, "databaseRes");
+    // } else {
+    let dataGoogle = [];
+    let snippetFromRegGoogle = await regexSnippet(link.snippet);
+    if (snippetFromRegGoogle) {
+      let dataFromGoogle = await findCompanyGoogle(snippetFromRegGoogle);
+      // console.log("DATA FROM GOOGLE", dataFromGoogle);
+      if (dataFromGoogle) {
+        fs.appendFile("googleResults.txt", dataFromGoogle.join("\n") + "\n");
+        dataGoogle.push([
           splitted[0],
           splitted[1],
-          yelloPagesFromSnippet.companyInfo.title,
           location,
-          yelloPagesFromSnippet.companyInfo.website,
-          yelloPagesFromSnippet.email
+          vertical,
+          ...dataFromGoogle
+        ]);
+        console.log("DATA GOOGLE", dataGoogle);
+        await postDataToAppsScript(scriptUrl, dataGoogle, "dataFromGoogle");
+        //}
+        //} else {
+        let yelloPagesFromSnippet = await scraPeYellowPages(
+          link.snippet,
+          location,
+          vertical
         );
-
-        console.log("YELLOW PAGES ARR", yellowPaArr);
-
-        // fs.appendFile("yellowData.txt", yellowPaArr.join("\n") + "\n"); // write to spredsheet
-
-        await postDataToAppsScript(scriptUrl, yellowPaArr, "yellopagedata");
-      } else {
-        let snippetFromRegYelp = await regexSnippet(link.snippet);
-
-        let yelpDataFromSnippet = await regexSnippetYelpData(
-          snippetFromRegYelp,
-          location
-        );
-
-        console.log("YELP DATA FROM SNIPPET", yelpDataFromSnippet);
-
-        if (yelpDataFromSnippet != undefined) {
-          // console.log("YELP RESULTS FROM SNIPPET", yelpDataFromSnippet);
-          let yelpArr = [];
-          let results = await getYelpInfo(yelpDataFromSnippet);
-          // console.log("RESULTS FROM YELP", results);
-          // fs.appendFile("yelpData.txt", JSON.stringify(results) + "\n"); // write to spredsheet
-          if (results) {
-            let emailFromToofYelp = await getEmailsFromToofr(
-              results.firstName,
-              results.lastName,
-              results.website
-            );
-            // console.log("EMAIL FROM TOOFR YELP", emailFromToofYelp);
-            let emailsToofrYelp = [];
-
-            emailFromToofYelp.forEach(el => {
-              emailsToofrYelp.push(el.email + " , " + " | " + el.confidence);
-            });
-
-            if (results != undefined) {
-              yelpArr = [
-                [
-                  results.firstName,
-                  results.lastName,
-                  results.website,
-                  vertical,
-                  location,
-                  ...emailsToofrYelp
-                ]
-              ];
-              console.log("YELP ARR", yelpArr);
-              Company.updateOrInsertCompany(
+        console.log("yelloPagesFromSnippet", yelloPagesFromSnippet);
+        let yellowPaArr = [];
+        if (yelloPagesFromSnippet !== undefined) {
+          yellowPaArr = [
+            [
+              yelloPagesFromSnippet.email,
+              yelloPagesFromSnippet.companyInfo.title,
+              yelloPagesFromSnippet.companyInfo.website,
+              yelloPagesFromSnippet.companyInfo.link,
+              vertical,
+              location
+              //JSON.stringify(yelloPagesFromSnippet.companyInfo)
+            ]
+          ];
+          Company.updateOrInsertCompany(
+            splitted[0],
+            splitted[1],
+            yelloPagesFromSnippet.companyInfo.title,
+            location,
+            yelloPagesFromSnippet.companyInfo.website,
+            yelloPagesFromSnippet.email
+          );
+          console.log("YELLOW PAGES ARR", yellowPaArr);
+          // fs.appendFile("yellowData.txt", yellowPaArr.join("\n") + "\n"); // write to spredsheet
+          await postDataToAppsScript(scriptUrl, yellowPaArr, "yellopagedata");
+        } else {
+          let snippetFromRegYelp = await regexSnippet(link.snippet);
+          let yelpDataFromSnippet = await regexSnippetYelpData(
+            snippetFromRegYelp,
+            location
+          );
+          console.log("YELP DATA FROM SNIPPET", yelpDataFromSnippet);
+          if (yelpDataFromSnippet != undefined) {
+            console.log("YELP RESULTS FROM SNIPPET", yelpDataFromSnippet);
+            let yelpArr = [];
+            let results = await getYelpInfo(yelpDataFromSnippet);
+            console.log("RESULTS FROM YELP", results);
+            // fs.appendFile("yelpData.txt", JSON.stringify(results) + "\n"); // write to spredsheet
+            if (results) {
+              let emailFromToofYelp = await getEmailsFromToofr(
                 results.firstName,
                 results.lastName,
-                location,
-                results.website,
-                emailsToofrYelp[0]
+                results.website
               );
+              // console.log("EMAIL FROM TOOFR YELP", emailFromToofYelp);
+              let emailsToofrYelp = [];
+              emailFromToofYelp.forEach(el => {
+                emailsToofrYelp.push(el.email + " , " + " | " + el.confidence);
+              });
+              if (results != undefined) {
+                yelpArr = [
+                  [
+                    results.firstName,
+                    results.lastName,
+                    results.website,
+                    vertical,
+                    location,
+                    ...emailsToofrYelp
+                  ]
+                ];
+                console.log("YELP ARR", yelpArr);
+                Company.updateOrInsertCompany(
+                  results.firstName,
+                  results.lastName,
+                  location,
+                  results.website,
+                  emailsToofrYelp[0]
+                );
+              }
             }
+            await postDataToAppsScript(scriptUrl, yelpArr, "yelpdata");
+          } else {
+            uncheckedData.push(linkedinData[i]);
           }
-          await postDataToAppsScript(scriptUrl, yelpArr, "yelpdata");
-        } else {
-          uncheckedData.push(linkedinData[i]);
         }
       }
     }

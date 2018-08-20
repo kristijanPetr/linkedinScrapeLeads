@@ -1,3 +1,6 @@
+const cluster = require("cluster");
+const http = require("http");
+const numCPUs = require("os").cpus().length;
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
@@ -13,7 +16,12 @@ const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 mongoose.connect(
   "mongodb://root:root@mongo-companies.server.pkristijan.xyz:27017/",
-  err => console.log("err", err)
+  err => {
+    if (err) {
+      console.log("err", err);
+      return;
+    }
+  }
 );
 
 const PORT = 4000;
@@ -52,7 +60,6 @@ let proxyIp = require("./myDataBase.json");
 
 //   res.send({ msg: "success" });
 // });
-
 
 app.post("/scrape", async (req, res) => {
   const { query, vertical, location, scriptUrl, count } = req.body;
@@ -123,8 +130,18 @@ app.post("/validatemails", async (req, res) => {
   res.send({ msg: "success" });
 });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+if (cluster.isMaster) {
+  console.log(`Master ${process.pid} is running`);
 
+  for (let i = 0; i < numCPUs.length; i++) {
+    cluster.fork();
+  }
+  cluster.on("exit", (worker, code, signal) => {
+    console.log(`worker ${worker.process.pid} died`);
+  });
+} else {
+}
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 /**
  * Normalize a port into a number, string, or false.
  */
