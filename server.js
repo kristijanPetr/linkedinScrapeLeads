@@ -8,9 +8,12 @@ const { scraper } = require("./scraper");
 const { getBusinessByZipCode } = require("./searchByZipCodes");
 const { getBusinessData } = require("./yelpBusinessLocation");
 const { validateRawEmails } = require("./bulkEmailChecker");
-let RateLimit = require("express-rate-limit");
-const { queueRequests,getCityCountry } = require("./utils");
-const { scraPeYellowPages } = require("./scrapeYellowPages");
+const { linkedinLeads } = require("./linkedinLeads");
+const { getMapsPlacesLocation } = require("./identifyLinkedin");
+
+// let RateLimit = require("express-rate-limit");
+const { queueRequests, getCityCountry } = require("./utils");
+// const { scraPeYellowPages } = require("./scrapeYellowPages");
 const mongoose = require("mongoose");
 
 mongoose.Promise = global.Promise;
@@ -60,6 +63,33 @@ let proxyIp = require("./myDataBase.json");
 
 //   res.send({ msg: "success" });
 // });
+app.post("/linkedinScrape", async (req, res) => {
+  const { query, vertical, location, scriptUrl, count } = req.body;
+  let link = `http://www.bing.com/search?q=${query}&qs=n&first=0`;
+
+  let results = await linkedinLeads(
+    link,
+    [],
+    location,
+    vertical,
+    count,
+    scriptUrl,
+    proxyIp.ip
+  );
+
+  res.send({ msg: "success", link });
+});
+
+app.post("/identifyLinkedin", async (req, res) => {
+ console.log(req.body);
+  const { linkedinData, scriptUrl, vertical, inputLocation } = req.body;
+  getMapsPlacesLocation(linkedinData, inputLocation, vertical, scriptUrl);
+  res.send({ msg: "success" });
+});
+
+// app.post("/identifyGoogle",async(req,res)=>{
+
+// })
 
 app.post("/scrape", async (req, res) => {
   const { query, vertical, location, scriptUrl, count } = req.body;
@@ -73,7 +103,7 @@ app.post("/scrape", async (req, res) => {
   req.startTime = startTime;
   queueRequests.push(startTime);
   console.log("Request Queue", startTime);
-  getCityCountry(location)
+
   let results = await scraper(
     link,
     [],

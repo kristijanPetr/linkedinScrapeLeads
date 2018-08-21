@@ -84,24 +84,34 @@ const emptyTextDataFile = () => {
 };
 
 const regexSnippet = async snippet => {
-  if (snippet != undefined) {
-    let matchedSnippet = snippet.match(/(?<=CEO|Owner|COO|Founder)(.*\n?)(?=,)/g);
-    
+  console.log("enter")
+  if (snippet) {
+    let matchedSnippet = snippet.match(/(CEO|Owner|COO|Founder)(.*\n?)(\,)/g);
+    console.log("match",matchedSnippet)
     if (matchedSnippet !== null) {
-      let newSnippet = matchedSnippet[0]
-        .split(".")[0]
-        .replace(/and|et|at|of|CEO|COO|Owner,/g, "");
-        //console.log("SNIPPET REGEX", newSnippet);
-      let filteredSnippet = newSnippet.replace(/[^a-zA-Z ]/g, ""); //.replace(/\s/g, ' ');
-      console.log("Filtered Snippet", filteredSnippet);
+      if (
+        matchedSnippet[0].indexOf("CEO") > -1 ||
+        matchedSnippet[0].indexOf("Owner") > -1 ||
+        matchedSnippet[0].indexOf("COO") > -1 ||
+        matchedSnippet[0].indexOf("Founder") > -1
+      ) {
+        let newSnippet = matchedSnippet[0]
+          .split(".")[0]
+          .replace(/and|et|at|of|CEO|COO|Owner|Founder|founder,/g, "");
+        console.log("SNIPPET REGEX", newSnippet);
+        let filteredSnippet = newSnippet.replace(/[^a-zA-Z ]/g, ""); //.replace(/\s/g, ' ');
+        console.log("Filtered Snippet", filteredSnippet);
 
-      return filteredSnippet;
+        return filteredSnippet;
+      }
     }
   }
 };
 
+// regexSnippet("View Karen Kilroy’s profile on LinkedIn, ... CEO at Kilroy Blockchain, LLC. Location Austin, Texas Area ... I am a hands-on full-stack Magento developer, ...");
+
 const getCityCountry = locationString => {
-  let arr = locationString.split(",");
+  let arr = locationString.split(",").map(item => item.trim());
   let foundCountry = arr.filter(item => countryMapper[item]);
   //console.log(foundCountry);
   let indexCountry = arr.indexOf(foundCountry[0]);

@@ -1,10 +1,6 @@
 const scrapeIt = require("scrape-it");
-//const axios = require("axios");
-const { getMapsPlacesLocation } = require("./index");
 const { postDataToAppsScript } = require("./utils");
 const { axiosProxyRequest } = require("./utils");
-const company = require("./mongooseDB/mongoDBController");
-const { scraPeYellowPages } = require("./scrapeYellowPages");
 
 // Promise interface
 async function scrapeData(
@@ -18,10 +14,8 @@ async function scrapeData(
   userStartTime
 ) {
   return await axiosProxyRequest(link)
-    //.get(link, { proxy }) //axiosProxyRequest(link) //await axiosProxyRequest(link)
     .then(async resp => {
       let html = resp.data;
-      //console.log("AXIOS HTML", html);
       let data = scrapeIt.scrapeHTML(html, {
         // Fetch the articles
         articles: {
@@ -62,11 +56,9 @@ async function scrapeData(
         }
       });
       console.log("DATA FROM LINKEDIN", data);
-      //.then(async ({ data, response }) => {
 
       let newData = [...results, ...data.articles];
 
-      //data.articles.map(article => fbLinkedinUsers.push({ ...article }));
       // console.log("NEXT PAGE DATA ", data.nextPage, link);
 
       let countNextPage = data.nextPage
@@ -99,22 +91,11 @@ async function scrapeData(
           2000
         );
       } else {
-        // console.log(results);
         await postDataToAppsScript(scriptUrl, results, "linkedin");
-        getMapsPlacesLocation(
-          results,
-          location,
-          vertical,
-          scriptUrl,
-          userStartTime
-        );
-        return results;
       }
       return html;
     })
     .catch(err => "");
-
-  //  });
 }
 
 function stripSpecalChar(str) {
@@ -122,5 +103,5 @@ function stripSpecalChar(str) {
 }
 
 module.exports = {
-  scraper: scrapeData
+  linkedinLeads: scrapeData
 };

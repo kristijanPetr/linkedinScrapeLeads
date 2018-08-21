@@ -2,8 +2,7 @@ const axios = require("axios");
 const fs = require("fs");
 const { scrapeEmailFromDomain } = require("./scrapeContactInfo");
 // const { emailPermutator } = require("./permutate");
-const { getLocationYelp, getYelpData } = require("./yelpLocation");
-const { searchPlaces, placeInfo } = require("./googlePlaceUtils");
+const { getLocationYelp } = require("./yelpLocation");
 const Company = require("./mongooseDB/mongoDBController");
 const { scraPeYellowPages } = require("./scrapeYellowPages");
 const { regexSnippetYelpData } = require("./yelpDataFromSnippet");
@@ -13,16 +12,12 @@ const {
   getCityCountry,
   extractDomainFromUrl
 } = require("./utils");
-const { findPersonFromDb } = require("./mongooseDB/mongoDB");
-// const { fbEmails, fbPlaces } = require("./firebase");
 const { findCompanyGoogle } = require("./scrapeGoogle");
-const countryMapper = require("./companyData/countriesMap.json");
 
 const {
   postDataToAppsScript,
   removeElem,
-  textDataToArray,
-  emptyTextDataFile
+  textDataToArray
 } = require("./utils");
 const { getEmailsFromToofr } = require("./getEmailsFromToofr");
 
@@ -39,10 +34,10 @@ const getMapsPlacesLocation = async (
 
   for (let i = 0; i < linkedinData.length; i++) {
     let link = linkedinData[i];
-    //console.log("LINK LOCATION", link.location);
+    let dataGoogle = [];
+    // console.log("LINK LOCATION", inputLocation);
 
-    let locationData = await getCityCountry(inputLocation);
-
+    let locationData = getCityCountry(inputLocation);
     let splitted = stripSpecalChar(link.name)
       .split(" ")
       .filter(item => item.length > 2);
@@ -51,7 +46,7 @@ const getMapsPlacesLocation = async (
 
     let location = link.location || `Location ${inputLocation}`;
 
-    // console.log("LINKEDIN SNIPPET ", link.snippet);
+    console.log("LINKEDIN SNIPPET ", link.snippet);
     let snippetFromReg = await regexSnippet(link.snippet);
     //console.log("LOCATION", inputLocation);
     //console.log("FIRST NAME ", splitted[0]);
@@ -71,24 +66,25 @@ const getMapsPlacesLocation = async (
 
     if (companyFromDb) {
       console.log("COMPANY FROM DB", companyFromDb);
-      let dbCompanyArr = [];
-      dbCompanyArr.push([
-        companyFromDb.state || "",
-        companyFromDb.country || "",
-        companyFromDb.website || "",
-        companyFromDb.firstName || "",
-        companyFromDb.lastName || "",
-        companyFromDb.email || "",
+      //let dbCompanyArr = [];
+      dataGoogle.push([
+        companyFromDb.firstName || splitted[0],
+        companyFromDb.lastName || splitted[1],
         companyFromDb.companyName || "",
+        vertical,
+        companyFromDb.website || "",
+        location,
+        locationData.country,
         companyFromDb.description || "",
-        companyFromDb.address || ""
+        companyFromDb.address || "",
+        companyFromDb.email || ""
       ]);
       if (companyFromDb.email === null || companyFromDb.email === "") {
         // console.log("GET EMAIL FROM TOOFR DB");
         let emailCrawledDb = await scrapeEmailFromDomain(companyFromDb.website);
         console.log("EMAIL CRAWLED FROM DB RES", emailCrawledDb);
         if (emailCrawledDb) {
-          dbCompanyArr.push(emailCrawledDb[0]);
+          dataGoogle.push(emailCrawledDb[0]);
         } else {
           if (!emailCrawledDb) {
             let emailFromToofDB = await getEmailsFromToofr(
@@ -99,16 +95,15 @@ const getMapsPlacesLocation = async (
             if (emailFromToofDB) {
               //console.log("GET EMAIL FROM TOOFR DB", emailFromToofDB);
               emailFromToofDB.forEach(el => {
-                dbCompanyArr.push(el.email + " , " + " | " + el.confidence);
+                dataGoogle.push(el.email + " , " + " | " + el.confidence);
               });
             }
           }
         }
       }
-      console.log("dbCompanyarr", dbCompanyArr);
-      postDataToAppsScript(scriptUrl, dbCompanyArr, "databaseRes");
+      console.log("dbCompanyarr", dataGoogle);
+      postDataToAppsScript(scriptUrl, dataGoogle, "dataFromGoogle");
     } else {
-      let dataGoogle = [];
       console.log("DATA GOOGLE", snippetFromReg);
 
       // let snippetFromRegGoogle = await regexSnippet(link.snippet);
@@ -122,14 +117,17 @@ const getMapsPlacesLocation = async (
         let emailCrawled = await scrapeEmailFromDomain(domain);
         console.log("EMAILS FROM GOOGLE DOMAIN", emailCrawled);
         if (dataFromGoogle) {
-          fs.appendFile("googleResults.txt", dataFromGoogle.join("\n") + "\n");
+          // fs.appendFile("googleResults.txt", dataFromGoogle.join("\n") + "\n");
           dataGoogle.push([
             splitted[0],
             splitted[1],
-            location,
             vertical,
-            ...dataFromGoogle,
-            emailCrawled
+            dataFromGoogle[1],
+            location,
+            locationData.country,
+            emailCrawled,
+            "",
+            ""
           ]);
           Company.updateOrInsertCompany(
             splitted[0],
@@ -142,9 +140,9 @@ const getMapsPlacesLocation = async (
             snippetFromReg,
             emailCrawled
           );
-          console.log("DATA GOOGLE", dataGoogle);
-          await postDataToAppsScript(scriptUrl, dataGoogle, "dataFromGoogle");
         }
+        console.log("DATA GOOGLE", dataGoogle);
+        await postDataToAppsScript(scriptUrl, dataGoogle, "dataFromGoogle");
       } else {
         let yelloPagesFromSnippet = await scraPeYellowPages(
           link.snippet,
@@ -153,17 +151,21 @@ const getMapsPlacesLocation = async (
         );
         console.log("yelloPagesFromSnippet", yelloPagesFromSnippet);
 
-        let yellowPaArr = [];
+        //let yellowPaArr = [];
         if (yelloPagesFromSnippet !== undefined) {
-          yellowPaArr = [
+          dataGoogle = [
             [
-              yelloPagesFromSnippet.email,
+              splitted[0],
+              splitted[1],
+              vertical,
               yelloPagesFromSnippet.companyInfo.title,
               yelloPagesFromSnippet.companyInfo.website,
-              yelloPagesFromSnippet.companyInfo.link,
-              vertical,
               location,
-              yelloPagesFromSnippet.companyInfo.address
+              locationData.country,
+              yelloPagesFromSnippet.companyInfo.link,
+              yelloPagesFromSnippet.companyInfo.address,
+              yelloPagesFromSnippet.email
+
               //JSON.stringify(yelloPagesFromSnippet.companyInfo)
             ]
           ];
@@ -180,9 +182,9 @@ const getMapsPlacesLocation = async (
             yelloPagesFromSnippet.email
           );
 
-          console.log("YELLOW PAGES", yellowPaArr);
-          fs.appendFile("yellowData.txt", yellowPaArr.join("\n") + "\n");
-          await postDataToAppsScript(scriptUrl, yellowPaArr, "yellopagedata");
+          //console.log("YELLOW PAGES", yellowPaArr);
+          //fs.appendFile("yellowData.txt", yellowPaArr.join("\n") + "\n");
+          await postDataToAppsScript(scriptUrl, dataGoogle, "dataFromGoogle");
         } else {
           let yelpDataFromSnippet;
           let snippetFromRegYelp = await regexSnippet(link.snippet);
@@ -227,18 +229,19 @@ const getMapsPlacesLocation = async (
                 }
               }
               if (results != undefined) {
-                yelpArr = [
+                dataFromGoogle = [
                   [
                     results.firstName,
                     results.lastName,
+                    "",
                     results.website,
-                    vertical,
+                    locationData.city,
+                    locationData.country,
                     location,
-                    yelpMail,
-                    emailsToofrYelp
+                    yelpMail || emailsToofrYelp
                   ]
                 ];
-                console.log("YELP ARR", yelpArr);
+                console.log("YELP ARR", dataFromGoogle);
                 Company.updateOrInsertCompany(
                   results.firstName,
                   results.lastName,
@@ -252,154 +255,20 @@ const getMapsPlacesLocation = async (
                 );
               }
             }
-            await postDataToAppsScript(scriptUrl, yelpArr, "yelpdata");
-          } else {
-            uncheckedData.push(linkedinData[i]);
-          }
+            await postDataToAppsScript(
+              scriptUrl,
+              dataFromGoogle,
+              "dataFromGoogle"
+            );
+          } //else {
+          //uncheckedData.push(linkedinData[i]);
+          //}
         }
       }
     }
   }
 
   // return;
-  for (let i = 0; i < uncheckedData.length; i++) {
-    console.log("SECOND FOR .....");
-    let link = uncheckedData[i];
-
-    //  fbLinkedinUsers.push(link)
-    let splitted = stripSpecalChar(link.name)
-      .split(" ")
-      .filter(item => item.length > 2);
-    let filteredName = (splitted[0] + " " + splitted[1]).replace(
-      /[^\w\s]/gi,
-      ""
-    );
-
-    let location = link.location || `Location ${inputLocation}`;
-
-    let yelpAddress = await getLocationYelp(filteredName, location);
-    console.log("Yelp Address", yelpAddress);
-
-    let placeData;
-    if (!yelpAddress) {
-      placeData = await searchPlaces(
-        "" + filteredName + ", " + vertical + ", " + location + ""
-      );
-      // console.log("Search Place ", placeData)
-      placeData = placeData[0];
-      // await getGooglePlaceInfo(
-      //   "" + filteredName + ", " + vertical + ", " + location + "",
-      //   "query",
-      //   getGooglePlacesApiKeys()
-      // );
-    }
-
-    if (!placeData) {
-      if (!yelpAddress) continue;
-      placeData = await searchPlaces(
-        "" + filteredName + ", " + vertical + ", " + yelpAddress + ""
-      );
-      placeData = placeData[0];
-      // placeData = await getGooglePlaceInfo(
-      //   "" + filteredName + ", " + vertical + ", " + yelpAddress + "",
-      //   "query",
-      //   getGooglePlacesApiKeys()
-      // );
-      if (!placeData) continue;
-      continue;
-    }
-
-    let placeIdInfo = await placeInfo(placeData.place_id);
-    // console.log("place ID", placeIdInfo);
-    // await getGooglePlaceInfo(
-    //   placeData.placeId,
-    //   "placeid",
-    //   getGooglePlacesApiKeys()
-    // );
-    let { vicinity, name, website = "", rating = "" } = placeIdInfo;
-
-    placesArr.push([
-      name,
-      splitted[0],
-      splitted[1],
-      link.link,
-      vicinity,
-      website,
-      rating
-    ]);
-
-    let domain = website.match(".*://?([^/]+)")
-      ? website.match(".*://?([^/]+)")[1]
-      : `${filteredName.replace(" ", "")}.com`;
-
-    let crawlEmail = await scrapeEmailFromDomain(website || domain);
-
-    // console.log(
-    //   "Firstname",
-    //   splitted[0],
-    //   "LastName",
-    //   splitted[1],
-    //   "Website",
-    //   website,
-    //   "Domain",
-    //   domain
-    // );
-
-    let emailFromToof = await getEmailsFromToofr(
-      splitted[0],
-      splitted[1],
-      website || domain
-    );
-
-    // console.log("EMAILS FROM TOOFR", emailFromToof);
-    if (emailFromToof != []) {
-      let emailsToofr = [];
-      emailFromToof.forEach(el => {
-        emailsToofr.push(el.email + " , " + " | " + el.confidence);
-      });
-    }
-
-    //let firstEmail = crawlEmail.split(",")[0];
-
-    console.log("EMAILS FROM TOOFR", emailsToofr);
-
-    let emails = [
-      ...[
-        name,
-        splitted[0],
-        splitted[1],
-        link.link,
-        website,
-        filteredName,
-        emailsToofr.join(" ")
-        //crawlEmail
-      ]
-      //...permutateEmails
-    ];
-    emailLeads.push(emails);
-  }
-  await postDataToAppsScript(scriptUrl, placesArr, "places");
-
-  await postDataToAppsScript(scriptUrl, emailLeads, "emails");
-  //startTime;
-  // await getBusinessData(vertical, inputLocation, scriptUrl);
-  let queueRequests = removeElem(userStartTime);
-  let isItLastReq = queueRequests.length === 0;
-  console.log("Is it last request? ", isItLastReq, queueRequests);
-  if (isItLastReq) {
-    let rawEmails = textDataToArray();
-    //console.log(rawEmails);
-    console.log("PROCESS FINISHED");
-    // Remove File data before Validation
-    //emptyTextDataFile();
-    //validateRawEmails(scriptUrl, rawEmails);
-
-    await postDataToAppsScript(
-      "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
-      textDataToArray().map(item => [item]),
-      "verifiedEmails"
-    );
-  }
 };
 
 function stripSpecalChar(str) {

@@ -19,3 +19,15 @@ sales@windonics.com,Windonics Inc.,http://www.windonics.com,https://www.yellowpa
 ,BMO Harris Bank,https://www.bmoharris.com,https://www.yellowpages.com/chicago-il/mip/bmo-harris-bank-469880027?lid=469880027,Developer,Location Chicago,Illinois,451 N State St
 ,CEO Deliveries,,https://www.yellowpages.com/chicago-il/mip/ceo-deliveries-12516349?lid=12516349,Developer,Location Chicago,Illinois,540 N State St
 ,Rareform Magazine,,https://www.yellowpages.com/chicago-il/mip/rareform-magazine-475739330?lid=475739330,Developer,Location Chicago,Illinois,28 E Jackson Blvd
+,BMO Harris Bank,http://bmoharris.com,https://www.yellowpages.com/chicago-il/mip/bmo-harris-bank-2959072?lid=2959072,Developer,Location Chicago,Illinois,5960 W Irving Park Rd
+,Full Circle Renovation & Construction - CLOSED,,https://www.yellowpages.com/chicago-il/mip/full-circle-renovation-construction-475493741?lid=475493741,Developer,Location Chicago,Illinois,10000 S Peoria St
+,Employment Assoc Group - CLOSED,,https://www.yellowpages.com/chicago-heights-il/mip/employment-assoc-group-469808575?lid=469808575,Developer,Location Chicago,Illinois,246 Vollmer Rd
+,Hall's Construction,,https://www.yellowpages.com/chicago-il/mip/halls-construction-1948374?lid=1948374,Developer,Location Chicago,Illinois,3922 W Polk St
+,Project Launch,,https://www.yellowpages.com/wheeling-il/mip/project-launch-469288372?lid=469288372,Developer,Location Chicago,Illinois,318 Partridge Ln
+,Delta Mu Delta Honor Society,http://deltamudelta.org,https://www.yellowpages.com/brookfield-il/mip/delta-mu-delta-honor-society-6050399?lid=6050399,Developer,Location Chicago,Illinois,9217 Broadway Ave Ste 1
+,Elderly Housing Development,,https://www.yellowpages.com/chicago-il/mip/elderly-housing-development-537445260?lid=537445260,Developer,Location Chicago,Illinois,5801 W North Ave
+,Clear Internet,,https://www.yellowpages.com/chicago-il/mip/clear-internet-462360794?lid=462360794,Developer,Location Chicago,Illinois,900 N Michigan Ave
+,New London Associates,http://www.newlondonassoc.com/contact.html,https://www.yellowpages.com/inverness-il/mip/new-london-associates-1498008?lid=1498008,Developer,Location Chicago,Illinois,1608 W Colonial Pkwy Ste 101
+,Sears Home Improvement,https://www.searshomeservices.com/improve/heating-cooling-systems?SID=5301&PID=8&utm_source=iyp&utm_medium=iyp&utm_campaign=HVAC,https://www.yellowpages.com/chicago-il/mip/sears-home-improvement-468625055?lid=1001809689819,Developer,Location Chicago,Illinois,1601 N Harlem Ave
+,Prestige Private Alternatives,,https://www.yellowpages.com/chicago-il/mip/prestige-private-alternatives-473579092?lid=473579092,Developer,Location Chicago,Illinois,1441 W 103rd St
+,Elderly Housing Development,,https://www.yellowpages.com/chicago-il/mip/elderly-housing-development-537445260?lid=537445260,Developer,Location Chicago,Illinois,5801 W North Ave
