@@ -45,7 +45,7 @@ async function findPersonFromDb(firstName) {
 
   // company.getRandomUser()
 
-company.findByCompanyName("spotlight business affairs inc").then(res => console.log(res));
+// company.findByCompanyName("spotlight business affairs inc").then(res => console.log(res));
 
 async function filterDataFromDbAndPostToScript(
   firstname,
