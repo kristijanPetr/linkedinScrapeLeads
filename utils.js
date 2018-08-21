@@ -85,13 +85,13 @@ const emptyTextDataFile = () => {
 
 const regexSnippet = async snippet => {
   if (snippet != undefined) {
-    let matchedSnippet = snippet.match(/(?<=CEO|Owner|COO)(.*\n?)(?=,)/g);
-
+    let matchedSnippet = snippet.match(/(?<=CEO|Owner|COO|Founder)(.*\n?)(?=,)/g);
+    
     if (matchedSnippet !== null) {
       let newSnippet = matchedSnippet[0]
         .split(".")[0]
-        .replace(/at|of|CEO|COO|Owner,/g, "");
-
+        .replace(/and|et|at|of|CEO|COO|Owner,/g, "");
+        //console.log("SNIPPET REGEX", newSnippet);
       let filteredSnippet = newSnippet.replace(/[^a-zA-Z ]/g, ""); //.replace(/\s/g, ' ');
       console.log("Filtered Snippet", filteredSnippet);
 
