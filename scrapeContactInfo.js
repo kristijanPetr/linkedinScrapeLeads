@@ -9,7 +9,7 @@ async function emailCrawler(website) {
   console.log("Website", website);
   //await fs.appendFileSync("websites.txt", website + "\n");
   // A level is how far removed (in  terms of link clicks) a page is from the root page (only follows same domain routes)
-  return "";
+  //return "";
   return emailscraper
     .getLevels(2, 5000)
     .then(async emails => {
@@ -25,7 +25,7 @@ async function emailCrawler(website) {
       //     .map(el => [el]),
       //   "rawEmails" //"rawEmails"
       // );
-      await writeEmailsToFile(emails);
+      //await writeEmailsToFile(emails);
       return emails.length > 0 ? emails.join(",") : "";
     })
     .catch(e => {
@@ -34,6 +34,6 @@ async function emailCrawler(website) {
     });
 }
 
-//  emailCrawler("vargasjewelerstrophieslompoc.com");
+// emailCrawler("https://polygraphmedia.com/");
 
 module.exports.scrapeEmailFromDomain = emailCrawler; //scrapeEmailFromDomain;

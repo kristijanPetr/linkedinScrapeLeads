@@ -5,10 +5,10 @@ const client = yelp.client(apiKey);
 const { regexSnippet } = require("./utils");
 
 async function regexSnippetYelpData(snippet, location) {
-  // let filteredSnippet = regexSnippet(snippet);
-  let results = await getYelpData(snippet, location);
+  let filteredSnippet = regexSnippet(snippet);
+  let results = await getYelpData(filteredSnippet, location);
   if (results != undefined) {
-    //   console.log("RESULTS", results);
+    //console.log("RESULTS", results);
     return results;
   }
 }
@@ -23,7 +23,7 @@ async function getYelpData(term, location) {
       if (response.jsonBody.businesses.length > 0) {
         let company = response.jsonBody.businesses[0].url;
 
-        // console.log(url);
+       // console.log(response.jsonBody.businesses);
         return company;
       }
     })
@@ -32,6 +32,6 @@ async function getYelpData(term, location) {
     });
 }
 
-// regexSnippetYelpData("Ivelin Ivanov. co-founder and CEO at Telestax, Inc. Location Austin, Texas Area Industry Computer Software","Texas");
+//regexSnippetYelpData("Flynn Construction","Austin");
 
 module.exports = { regexSnippetYelpData };

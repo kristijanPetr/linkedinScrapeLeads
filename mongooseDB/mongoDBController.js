@@ -152,15 +152,15 @@ module.exports = {
       return res.status(204).json();
     });
   },
-  findByCompanyName: companyName => {
-    companyName = companyName.toLowerCase();
-    return companiesModel
-      .findOne({ companyName })
-      .then(company => {
-        return company;
-      })
-      .catch(err => []);
-  },
+  // findByCompanyName: companyName => {
+  //   companyName = companyName.toLowerCase();
+  //   return companiesModel
+  //     .findOne({ companyName })
+  //     .then(company => {
+  //       return company;
+  //     })
+  //     .catch(err => []);
+  // },
   findByUserName: (firstName, lastName, state) => {
     firstName = firstName.toLowerCase();
     lastName = lastName.toLowerCase();
@@ -173,20 +173,48 @@ module.exports = {
       })
       .catch(err => {});
   },
-  updateOrInsertCompany: (firstName, lastName, state, website, email) => {
+  updateOrInsertCompany: (
+    firstName,
+    lastName,
+    address,
+    website,
+    city,
+    state,
+    shortCode,
+    companyName,
+    email
+  ) => {
+    companyName = companyName.toLowerCase().trim();
     companiesModel.update(
-      { firstName, lastName, state },
+      { companyName },
       {
         website,
-        email
+        email,
+        address,
+        companyName,
+        firstName,
+        lastName,
+        state,
+        city,
+        state: shortCode
       },
       { upsert: true, setDefaultsOnInsert: true },
       (err, raw) => {
-        console.log("err", err, "raw ", raw);
+        console.log("err", err, "raw ", raw, "company name", companyName);
         if (err) {
         }
       }
     );
+  },
+  findByCompanyName: companyName => {
+    companyName = companyName.toLowerCase().trim();
+    return companiesModel
+      .findOne({ companyName })
+      .then(result => {
+        console.log("Company Found", result);
+        return result;
+      })
+      .catch(err => console.log("Find company err", err));
   },
   findByUserAndCompany: (firstName, lastName, companyName) => {
     if (
@@ -238,5 +266,20 @@ module.exports = {
         return company;
       })
       .catch(err => []);
+  },
+  getRandomUser: () => {
+    companiesModel.count().exec(function(err, count) {
+      // Get a random entry
+      var random = Math.floor(Math.random() * count);
+
+      // Again query all users but only fetch one offset by our random #
+      companiesModel
+        .findOne()
+        .skip(random)
+        .exec(function(err, result) {
+          // Tada! random user
+          console.log(result);
+        });
+    });
   }
 };

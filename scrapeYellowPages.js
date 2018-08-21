@@ -36,7 +36,7 @@ async function scraPeYellowPages(name, location, vertical) {
             // console.log("datalink", data.articles[0].link);
             if (data.articles[3].link) {
               let linkProfile = data.articles[3].link;
-              // console.log("Company Info", data.articles[3]);
+              console.log("Company Info", data.articles[3]);
               let companyInfo = data.articles[3];
               let email = await scrapeEmailFromYellowP(linkProfile);
               // console.log(
@@ -84,6 +84,6 @@ async function scrapeEmailFromYellowP(link) {
 
 // console.log(snippet);
 
-// scraPeYellowPages("Flynn Construction", "Texas", "Building");
+//scraPeYellowPages("Flynn Construction", "Texas", "Building");
 
 module.exports.scraPeYellowPages = scraPeYellowPages;

@@ -1,6 +1,8 @@
 const axioshttps = require("axios-https-proxy-fix");
 const axios = require("axios");
 const fs = require("fs");
+const countryMapper = require("./companyData/countriesMap.json");
+
 const inputStr = inputStr => {
   return inputStr
     .replace(/[\s_-]+/g, " ")
@@ -90,12 +92,36 @@ const regexSnippet = async snippet => {
         .split(".")[0]
         .replace(/at|of|CEO|COO|Owner,/g, "");
 
-      let filteredSnippet = newSnippet.replace(/[^a-zA-Z ]/g, "")//.replace(/\s/g, ' ');
+      let filteredSnippet = newSnippet.replace(/[^a-zA-Z ]/g, ""); //.replace(/\s/g, ' ');
       console.log("Filtered Snippet", filteredSnippet);
 
       return filteredSnippet;
     }
   }
+};
+
+const getCityCountry = locationString => {
+  let arr = locationString.split(",");
+  let foundCountry = arr.filter(item => countryMapper[item]);
+  //console.log(foundCountry);
+  let indexCountry = arr.indexOf(foundCountry[0]);
+  let city =
+    (indexCountry > -1 ? (indexCountry === 1 ? arr[0] : arr[1]) : "") || "";
+  console.log({
+    country: foundCountry[0],
+    city
+  });
+  return {
+    country: foundCountry[0],
+    city,
+    shortCode: countryMapper[foundCountry[0]] || ""
+  };
+};
+
+const extractDomainFromUrl = url => {
+  let matches = url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+  let domain = matches && matches[1];
+  return domain;
 };
 
 module.exports = {
@@ -107,7 +133,9 @@ module.exports = {
   textDataToArray,
   removeElem,
   emptyTextDataFile,
-  regexSnippet
+  regexSnippet,
+  getCityCountry,
+  extractDomainFromUrl
 };
 
 //console.log(textDataToArray())

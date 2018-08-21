@@ -29,10 +29,10 @@ function getYelpInfo(link) {
 
       let firstName = results[0];
       let lastName = results[1];
-
+      //console.log(resp);
       return { firstName, lastName, website: resultWebsite };
     })
     .catch(err => console.log(err.message));
 }
-
+// getYelpInfo("https://www.yelp.com/biz/flynn-construction-austin");
 module.exports = { getYelpInfo };

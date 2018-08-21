@@ -1,34 +1,29 @@
 const mongoose = require("mongoose");
 const company = require("./mongoDBController");
-// mongoose.Promise = global.Promise;
-// mongoose.connect(
-//   "mongodb://root:root@mongo-companies.server.pkristijan.xyz:27017/",
+mongoose.Promise = global.Promise;
+mongoose.connect(
+  "mongodb://root:root@mongo-companies.server.pkristijan.xyz:27017/",
 
-//   err => {
-//     if(err){
-//       console.log("ERR DB CONNECT",err)
-//       return;
-
-//     }
-//   }
-// );
+  err => {
+    if (err) {
+      console.log("ERR DB CONNECT", err);
+      return;
+    }
+  }
+);
 const { postDataToAppsScript } = require("../utils");
 var companiesModel = require("./mongoDBModel");
 
 async function searchFromDB(firstName) {
   // console.log("firstName", firstName);
-  return companiesModel.findOne(
-    { firstName },
-    "name occupation",
-    async function(err, id) {
-      if (err) return err;
-      // console.log("id", id);
-      if (id !== null) {
-        // console.log("in if");
-        return id;
-      }
+  return companiesModel.findOne({ firstName }, async function(err, res) {
+    if (err) return err;
+    // console.log("id", id);
+    if (res !== null) {
+      console.log("in if", res);
+      return res;
     }
-  );
+  });
 }
 
 async function findPersonFromDb(firstName) {
@@ -41,14 +36,6 @@ async function findPersonFromDb(firstName) {
   });
 }
 
-module.exports.findPersonFromDb = findPersonFromDb;
-
-// async function getFromDb() {
-//   let personFromDb = await findPerson("Franklin");
-//   console.log("PERSON FROM DB", personFromDb);
-// }
-// getFromDb();
-
 //"Damon Gross - COO - Hyde Park Jewelers and"
 // company.findSimilar("Damon", "Gross").then(resp => console.log(resp));
 
@@ -56,7 +43,9 @@ module.exports.findPersonFromDb = findPersonFromDb;
 //   .findByUserName("/Franklin/", "/Barbecue/", "Location: Austin, Texas")
 //   .then(resp => console.log("resp from db", resp));
 
-// company.show();
+  // company.getRandomUser()
+
+company.findByCompanyName("spotlight business affairs inc").then(res => console.log(res));
 
 async function filterDataFromDbAndPostToScript(
   firstname,
@@ -87,3 +76,4 @@ async function filterDataFromDbAndPostToScript(
     .catch(err => []);
 }
 // searchFromDB("Franklin");
+module.exports.findPersonFromDb = findPersonFromDb;

@@ -9,7 +9,7 @@ const { getBusinessByZipCode } = require("./searchByZipCodes");
 const { getBusinessData } = require("./yelpBusinessLocation");
 const { validateRawEmails } = require("./bulkEmailChecker");
 let RateLimit = require("express-rate-limit");
-const { queueRequests } = require("./utils");
+const { queueRequests,getCityCountry } = require("./utils");
 const { scraPeYellowPages } = require("./scrapeYellowPages");
 const mongoose = require("mongoose");
 
@@ -73,6 +73,7 @@ app.post("/scrape", async (req, res) => {
   req.startTime = startTime;
   queueRequests.push(startTime);
   console.log("Request Queue", startTime);
+  getCityCountry(location)
   let results = await scraper(
     link,
     [],

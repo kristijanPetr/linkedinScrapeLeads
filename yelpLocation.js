@@ -26,7 +26,7 @@ function getPlacesYelp(name, location) {
     });
 }
 
-// getPlacesYelp("Hyde Park", "Location: Denver, Colorado").then(res => {
+// getPlacesYelp("Flynn Construction Austin Texas").then(res => {
 //   console.log(res);
 // });
 
@@ -35,15 +35,15 @@ async function getYelpData(data) {
     .business(data)
     .then(response => {
       let url = response.jsonBody.url;
-      // console.log(url);
-      // console.log(response.jsonBody.name);
+      console.log(url);
+      //console.log(response.jsonBody);
       return url;
     })
     .catch(e => {
-      // console.log(e);
+      console.log(e);
     });
 }
 
-// getYelpData("HEB. Location Austin, Texas Area Industry Retail. ... CEO at Society of St. Vincent de Paul Detroit.");
+ //getYelpData("Flynn Construction Austin Texas");
 
 module.exports = { getLocationYelp: getPlacesYelp, getYelpData };
