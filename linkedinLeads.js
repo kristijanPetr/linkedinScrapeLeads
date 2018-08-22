@@ -92,7 +92,11 @@ async function scrapeData(
         );
       } else {
         console.log("RESULTS", results);
-        await postDataToAppsScript(scriptUrl, results, "linkedin");
+        await postDataToAppsScript(
+          scriptUrl,
+          results.length === 0 && newData.length ? newData : results,
+          "linkedin"
+        );
       }
       return html;
     })
