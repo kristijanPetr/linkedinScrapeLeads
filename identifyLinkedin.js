@@ -29,11 +29,11 @@ const getMapsPlacesLocation = async (
 ) => {
   let placesArr = [];
   let emailLeads = [];
-  let uncheckedData = [];
 
   for (let i = 0; i < linkedinData.length; i++) {
     let link = linkedinData[i];
     let dataGoogle = [];
+    let uncheckedData = [];
     // console.log("LINK LOCATION", inputLocation);
 
     let locationData = getCityCountry(inputLocation);
@@ -218,7 +218,7 @@ const getMapsPlacesLocation = async (
                 // );
                 // console.log("yelp mail toofr", yelpMailToofr);
                 if (results != undefined) {
-                  dataFromGoogle = [
+                  dataGoogle = [
                     [
                       results.firstName,
                       results.lastName,
@@ -232,7 +232,7 @@ const getMapsPlacesLocation = async (
                       yelpMail
                     ]
                   ];
-                  console.log("YELP ARR", dataFromGoogle);
+                  console.log("YELP ARR", dataGoogle);
                   Company.updateOrInsertCompany(
                     results.firstName,
                     results.lastName,
@@ -248,16 +248,28 @@ const getMapsPlacesLocation = async (
               }
               await postDataToAppsScript(
                 scriptUrl,
-                dataFromGoogle,
+                dataGoogle,
                 "dataFromGoogle"
               );
-            } //else {
-            //uncheckedData.push(linkedinData[i]);
-            //}
+            }
           }
         }
       }
     }
+    // // ELSE
+    // let snippetUncheckedRegex = await regexSnippet(link.snippet);
+    // uncheckedData.push([
+    //   link.firstName,
+    //   link.lastName,
+    //   vertical,
+    //   snippetUncheckedRegex,
+    //   "",
+    //   location,
+    //   locationData.country,
+    //   link.profileUrl
+    // ]);
+    // console.log("UNCHECKED DATA", uncheckedData);
+    // await postDataToAppsScript(scriptUrl, uncheckedData, "dataFromGoogle");
   }
   // return;
 };

@@ -59,7 +59,7 @@ async function scrapeData(
 
       let newData = [...results, ...data.articles];
 
-      // console.log("NEXT PAGE DATA ", data.nextPage, link);
+      console.log("NEXT PAGE DATA ", data.nextPage, link);
 
       let countNextPage = data.nextPage
         ? data.nextPage
