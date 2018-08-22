@@ -99,7 +99,7 @@ async function scrapeData(
           2000
         );
       } else {
-        // console.log(results);
+        console.log("RESULTS", results);
         await postDataToAppsScript(scriptUrl, results, "linkedin");
         getMapsPlacesLocation(
           results,

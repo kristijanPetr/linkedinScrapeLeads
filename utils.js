@@ -25,7 +25,7 @@ const inputStr = inputStr => {
 const axiosProxyRequest = url => {
   return axioshttps.get(url, {
     proxy: {
-      host: "fr.proxymesh.com",
+      host: "open.proxymesh.com",
       port: 31280,
       auth: {
         username: "tealeaf",

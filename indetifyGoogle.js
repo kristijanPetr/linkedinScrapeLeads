@@ -15,9 +15,8 @@ const {
 } = require("./utils");
 const { getEmailsFromToofr } = require("./getEmailsFromToofr");
 
-const getMapsPlacesLocation = async (
+const getMapsPlacesLocationGoogle = async (
   googleData,
-  inputLocation,
   vertical,
   scriptUrl,
   userStartTime
@@ -26,19 +25,21 @@ const getMapsPlacesLocation = async (
   let emailLeads = [];
 
   for (let i = 0; i < googleData.length; i++) {
-    console.log("SECOND FOR .....");
+    console.log("GOOGLE DATA", googleData);
     let link = googleData[i];
 
     //  fbLinkedinUsers.push(link)
-    let splitted = stripSpecalChar(link.name)
-      .split(" ")
-      .filter(item => item.length > 2);
-    let filteredName = (splitted[0] + " " + splitted[1]).replace(
-      /[^\w\s]/gi,
-      ""
-    );
+    // let splitted = stripSpecalChar(link.name)
+    //   .split(" ")
+    //   .filter(item => item.length > 2);
+    //  = (splitted[0] + " " + splitted[1]).replace(
+    //   /[^\w\s]/gi,
+    //   ""
+    // );
+    //return;
+    let filteredName = link.firstName + " " + link.lastName;
 
-    let location = link.location || `Location ${inputLocation}`;
+    let location = link.location;
 
     let yelpAddress = await getLocationYelp(filteredName, location);
     console.log("Yelp Address", yelpAddress);
@@ -83,9 +84,9 @@ const getMapsPlacesLocation = async (
 
     placesArr.push([
       name,
-      splitted[0],
-      splitted[1],
-      link.link,
+      link.firstName,
+      link.lastName,
+      link.url,
       vicinity,
       website,
       rating
@@ -108,11 +109,11 @@ const getMapsPlacesLocation = async (
     //   domain
     // );
 
-    let emailFromToof = await getEmailsFromToofr(
-      splitted[0],
-      splitted[1],
-      website || domain
-    );
+    // let emailFromToof = await getEmailsFromToofr(
+    //   link.firstName,
+    //   link.lastName,
+    //   website || domain
+    // );
 
     // console.log("EMAILS FROM TOOFR", emailFromToof);
     if (emailFromToof != []) {
@@ -129,9 +130,9 @@ const getMapsPlacesLocation = async (
     let emails = [
       ...[
         name,
-        splitted[0],
-        splitted[1],
-        link.link,
+        link.firstName,
+        link.lastName,
+        link.url,
         website,
         filteredName,
         emailsToofr.join(" ")
@@ -171,5 +172,5 @@ function stripSpecalChar(str) {
 
 module.exports = {
   //postDataToAppsScript,
-  getMapsPlacesLocation
+  getMapsPlacesLocationGoogle
 };

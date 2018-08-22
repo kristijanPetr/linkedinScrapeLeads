@@ -10,6 +10,7 @@ const { getBusinessData } = require("./yelpBusinessLocation");
 const { validateRawEmails } = require("./bulkEmailChecker");
 const { linkedinLeads } = require("./linkedinLeads");
 const { getMapsPlacesLocation } = require("./identifyLinkedin");
+const { getMapsPlacesLocationGoogle } = require("./indetifyGoogle");
 
 // let RateLimit = require("express-rate-limit");
 const { queueRequests, getCityCountry } = require("./utils");
@@ -81,15 +82,17 @@ app.post("/linkedinScrape", async (req, res) => {
 });
 
 app.post("/identifyLinkedin", async (req, res) => {
- console.log(req.body);
+  console.log(req.body);
   const { linkedinData, scriptUrl, vertical, inputLocation } = req.body;
   getMapsPlacesLocation(linkedinData, inputLocation, vertical, scriptUrl);
   res.send({ msg: "success" });
 });
 
-// app.post("/identifyGoogle",async(req,res)=>{
-
-// })
+app.post("/identifyGoogle", async (req, res) => {
+  const { googleData, scriptUrl, vertical } = req.body;
+  getMapsPlacesLocationGoogle(googleData, vertical, scriptUrl);
+  res.send({ msg: "success" });
+});
 
 app.post("/scrape", async (req, res) => {
   const { query, vertical, location, scriptUrl, count } = req.body;

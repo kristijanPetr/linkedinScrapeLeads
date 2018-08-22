@@ -13,7 +13,6 @@ const {
   extractDomainFromUrl
 } = require("./utils");
 const { findCompanyGoogle } = require("./scrapeGoogle");
-
 const {
   postDataToAppsScript,
   removeElem,
@@ -65,42 +64,31 @@ const getMapsPlacesLocation = async (
     //console.log("COMPANY FROM DB", companyFromDb);
 
     if (companyFromDb) {
+      // let emailFromToofDB = await getEmailsFromToofr(
+      //   companyFromDb.firstName || splitted[0],
+      //   companyFromDb.lastName || splitted[1],
+      //   companyFromDb.website || ""
+      // );
+
+      // console.log("email from toof db", emailFromToofDB);
       console.log("COMPANY FROM DB", companyFromDb);
       //let dbCompanyArr = [];
+      let emailCrawledDb =
+        (await scrapeEmailFromDomain(companyFromDb.website)) || [];
       dataGoogle.push([
         companyFromDb.firstName || splitted[0],
         companyFromDb.lastName || splitted[1],
-        companyFromDb.companyName || "",
         vertical,
+        companyFromDb.companyName || "",
         companyFromDb.website || "",
         location,
         locationData.country,
-        companyFromDb.description || "",
+        "",
         companyFromDb.address || "",
-        companyFromDb.email || ""
+        companyFromDb.email || emailCrawledDb[0],
+        companyFromDb.description || ""
       ]);
-      if (companyFromDb.email === null || companyFromDb.email === "") {
-        // console.log("GET EMAIL FROM TOOFR DB");
-        let emailCrawledDb = await scrapeEmailFromDomain(companyFromDb.website);
-        console.log("EMAIL CRAWLED FROM DB RES", emailCrawledDb);
-        if (emailCrawledDb) {
-          dataGoogle.push(emailCrawledDb[0]);
-        } else {
-          if (!emailCrawledDb) {
-            let emailFromToofDB = await getEmailsFromToofr(
-              companyFromDb.firstName,
-              companyFromDb.lastName,
-              companyFromDb.website
-            );
-            if (emailFromToofDB) {
-              //console.log("GET EMAIL FROM TOOFR DB", emailFromToofDB);
-              emailFromToofDB.forEach(el => {
-                dataGoogle.push(el.email + " , " + " | " + el.confidence);
-              });
-            }
-          }
-        }
-      }
+
       console.log("dbCompanyarr", dataGoogle);
       postDataToAppsScript(scriptUrl, dataGoogle, "dataFromGoogle");
     } else {
@@ -114,20 +102,27 @@ const getMapsPlacesLocation = async (
         console.log("DATA FROM GOOGLE", dataFromGoogle);
         let domain = await extractDomainFromUrl(dataFromGoogle[1]);
 
-        let emailCrawled = await scrapeEmailFromDomain(domain);
+        let emailCrawled = (await scrapeEmailFromDomain(domain)) || [];
         console.log("EMAILS FROM GOOGLE DOMAIN", emailCrawled);
+        // let googleDataToofrEmail = await getEmailsFromToofr(
+        //   splitted[0],
+        //   splitted[1],
+        //   dataFromGoogle[1]
+        // );
+        // console.log("google data toofr email", googleDataToofrEmail);
         if (dataFromGoogle) {
           // fs.appendFile("googleResults.txt", dataFromGoogle.join("\n") + "\n");
           dataGoogle.push([
             splitted[0],
             splitted[1],
             vertical,
+            "",
             dataFromGoogle[1],
             location,
             locationData.country,
-            emailCrawled,
             "",
-            ""
+            "",
+            emailCrawled[0]
           ]);
           Company.updateOrInsertCompany(
             splitted[0],
@@ -138,7 +133,7 @@ const getMapsPlacesLocation = async (
             locationData.country,
             locationData.shortCode,
             snippetFromReg,
-            emailCrawled
+            emailCrawled[0]
           );
         }
         console.log("DATA GOOGLE", dataGoogle);
@@ -153,6 +148,12 @@ const getMapsPlacesLocation = async (
 
         //let yellowPaArr = [];
         if (yelloPagesFromSnippet !== undefined) {
+          // let yellowPagesToofrEmail = await getEmailsFromToofr(
+          //   splitted[0],
+          //   splitted[1],
+          //   yelloPagesFromSnippet.companyInfo.website
+          // );
+          // console.log("email from toofr yellow pages", yellowPagesToofrEmail);
           dataGoogle = [
             [
               splitted[0],
@@ -210,64 +211,54 @@ const getMapsPlacesLocation = async (
                 yelpMail = (await scrapeEmailFromDomain(results.website)) || [];
                 console.log("YELP EMAIL", yelpMail);
 
-                if (!yelpMail) {
-                  if (results) {
-                    let emailFromToofYelp =
-                      (await getEmailsFromToofr(
-                        results.firstName,
-                        results.lastName,
-                        results.website
-                      )) || [];
-                    // console.log("EMAIL FROM TOOFR YELP", emailFromToofYelp);
-                    emailsToofrYelp = [];
-                    emailFromToofYelp.forEach(el => {
-                      emailsToofrYelp.push(
-                        el.email + " , " + " | " + el.confidence
-                      );
-                    });
-                  }
-                }
-              }
-              if (results != undefined) {
-                dataFromGoogle = [
-                  [
+                // let yelpMailToofr = await getEmailsFromToofr(
+                //   results.firstName,
+                //   results.lastName,
+                //   results.website
+                // );
+                // console.log("yelp mail toofr", yelpMailToofr);
+                if (results != undefined) {
+                  dataFromGoogle = [
+                    [
+                      results.firstName,
+                      results.lastName,
+                      vertical,
+                      "",
+                      results.website,
+                      location,
+                      locationData.country,
+                      "",
+                      "",
+                      yelpMail
+                    ]
+                  ];
+                  console.log("YELP ARR", dataFromGoogle);
+                  Company.updateOrInsertCompany(
                     results.firstName,
                     results.lastName,
-                    "",
+                    addressFromYelp,
                     results.website,
                     locationData.city,
                     locationData.country,
-                    location,
-                    yelpMail || emailsToofrYelp
-                  ]
-                ];
-                console.log("YELP ARR", dataFromGoogle);
-                Company.updateOrInsertCompany(
-                  results.firstName,
-                  results.lastName,
-                  addressFromYelp,
-                  results.website,
-                  locationData.city,
-                  locationData.country,
-                  locationData.shortCode,
-                  results.companyName,
-                  yelpMail[0] || emailsToofrYelp[0]
-                );
+                    locationData.shortCode,
+                    results.companyName,
+                    yelpMail[0] //|| emailsToofrYelp[0]
+                  );
+                }
               }
-            }
-            await postDataToAppsScript(
-              scriptUrl,
-              dataFromGoogle,
-              "dataFromGoogle"
-            );
-          } //else {
-          //uncheckedData.push(linkedinData[i]);
-          //}
+              await postDataToAppsScript(
+                scriptUrl,
+                dataFromGoogle,
+                "dataFromGoogle"
+              );
+            } //else {
+            //uncheckedData.push(linkedinData[i]);
+            //}
+          }
         }
       }
     }
   }
-
   // return;
 };
 
