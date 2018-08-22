@@ -65,12 +65,12 @@ async function scrapeData(
         ? data.nextPage
             .toString()
             .split("&first=")[1]
-            .split("&FORM=PORE")[0]
+            .split("&FORM=")[0]
         : null;
       let oldCountNextPage = link
         .toString()
         .split("&first=")[1]
-        .split("&FORM=PORE")[0];
+        .split("&FORM=")[0];
       console.log(countNextPage, oldCountNextPage);
       if (
         data.nextPage !== "" &&
