@@ -67,7 +67,7 @@ let proxyIp = require("./myDataBase.json");
 app.post("/linkedinScrape", async (req, res) => {
   const { query, vertical, location, scriptUrl, count } = req.body;
   let link = `http://www.bing.com/search?q=${query}&qs=n&first=0`;
-
+  console.log("query", query, "whole link query", link);
   let results = await linkedinLeads(
     link,
     [],
