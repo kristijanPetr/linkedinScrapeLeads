@@ -29,6 +29,7 @@ async function getYelpData(term, location) {
     })
     .catch(e => {
       console.log(e);
+      return null;
     });
 }
 

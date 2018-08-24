@@ -16,7 +16,7 @@ async function bulkEmailChecker(email) {
       console.log("RESP", status, event, email);
       return resp.data.status;
     })
-    .catch(err => console.log(err));
+    .catch(err => null);
 }
 
 async function validateRawEmails(

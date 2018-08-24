@@ -25,7 +25,7 @@ const inputStr = inputStr => {
 const axiosProxyRequest = url => {
   return axioshttps.get(url, {
     proxy: {
-      host: "open.proxymesh.com",
+      host: "us-wa.proxymesh.com",
       port: 31280,
       auth: {
         username: "tealeaf",
@@ -34,6 +34,23 @@ const axiosProxyRequest = url => {
     }
   });
 };
+
+// const axiosProxyRequest1 = url => {
+//   return axios.get(url, {
+//     proxy: {
+//       host:
+//         "http://zproxy.lum-superproxy.io",
+//       port: 22225,
+//       auth: {
+//         username: "lum-customer-hl_030a86e4-zone-static",
+//         password: "ueyv97j2vmup"
+//       }
+//     }
+//   });
+// };
+// axiosProxyRequest1(
+//   "http://www.bing.com/search?q=site%3Alinkedin.com+intitle%3ACOO+AND+inbody%3Achiropractor+Texas&qs=n&form=QBLH&sp=-1&pq=site%3Alinkedin.com+intitle%3Acoo+and+inbody%3Achiropractor+texas&sc=0-59&sk=&cvid=E9A3AD83A3724162B1F38CA156D1A81A"
+// ).then(res => console.log(res));
 
 const postDataToAppsScript = async (
   scriptUrl = "https://script.google.com/macros/s/AKfycbwvj6UAhPMaEPb3p-SshlFeJ_Z2jftVeSwh-K2-I9VG9aaCs0Qd/exec",
@@ -47,7 +64,7 @@ const postDataToAppsScript = async (
     .then(resp => {
       return resp.data;
     })
-    .catch(err => console.log(err));
+    .catch(err => {});
 };
 
 let queueRequests = [];
@@ -84,10 +101,10 @@ const emptyTextDataFile = () => {
 };
 
 const regexSnippet = async snippet => {
-  console.log("enter")
+  console.log("enter");
   if (snippet) {
     let matchedSnippet = snippet.match(/(CEO|Owner|COO|Founder)(.*\n?)(\,)/g);
-    console.log("match",matchedSnippet)
+    console.log("match", matchedSnippet);
     if (matchedSnippet !== null) {
       if (
         matchedSnippet[0].indexOf("CEO") > -1 ||

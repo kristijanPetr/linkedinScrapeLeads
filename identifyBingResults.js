@@ -20,7 +20,7 @@ const {
 } = require("./utils");
 const { getEmailsFromToofr } = require("./getEmailsFromToofr");
 
-const getMapsPlacesLocation = async (
+const getBingData = async (
   linkedinData,
   inputLocation,
   vertical,
@@ -32,21 +32,25 @@ const getMapsPlacesLocation = async (
 
   for (let i = 0; i < linkedinData.length; i++) {
     let link = linkedinData[i];
+    console.log("LINK", link);
     let dataGoogle = [];
     let uncheckedData = [];
     // console.log("LINK LOCATION", inputLocation);
 
-    let locationData = getCityCountry(inputLocation);
-    let splitted = stripSpecalChar(link.name)
-      .split(" ")
-      .filter(item => item.length > 2);
+    let locationData; //= getCityCountry(inputLocation);
+    console.log("LINK NAME", link.name);
+
+    let splitted = link.name.split("-");
+    // let splitted = stripSpecalChar(link.name)
+    //   .split(" ")
+    //   .filter(item => item.length > 2);
     let filterName = (splitted[0] + " " + splitted[1]).replace(/[^\w\s]/gi, "");
     //  fbLinkedinUsers.push(link)
 
     let location = link.location || `Location ${inputLocation}`;
 
-    console.log("LINKEDIN SNIPPET ", link.snippet);
-    let snippetFromReg = await regexSnippet(link.snippet);
+    console.log("LINKEDIN SNIPPET ", link.name);
+    let snippetFromReg = await regexSnippet(link.name);
     //console.log("LOCATION", inputLocation);
     //console.log("FIRST NAME ", splitted[0]);
     console.log("SNIPPET FROM REG", snippetFromReg);
@@ -140,7 +144,7 @@ const getMapsPlacesLocation = async (
         await postDataToAppsScript(scriptUrl, dataGoogle, "dataFromGoogle");
       } else {
         let yelloPagesFromSnippet = await scraPeYellowPages(
-          link.snippet,
+          link.name,
           location,
           vertical
         );
@@ -162,7 +166,7 @@ const getMapsPlacesLocation = async (
               yelloPagesFromSnippet.companyInfo.title,
               yelloPagesFromSnippet.companyInfo.website,
               location,
-              locationData.country,
+              "",//locationData.country,
               yelloPagesFromSnippet.companyInfo.link,
               yelloPagesFromSnippet.companyInfo.address,
               yelloPagesFromSnippet.email
@@ -176,9 +180,9 @@ const getMapsPlacesLocation = async (
             splitted[1],
             yelloPagesFromSnippet.companyInfo.address,
             yelloPagesFromSnippet.companyInfo.website,
-            locationData.city,
-            locationData.country,
-            locationData.shortCode,
+            "",//locationData.city,
+            "",//locationData.country,
+            "",//locationData.shortCode,
             yelloPagesFromSnippet.companyInfo.title,
             yelloPagesFromSnippet.email
           );
@@ -188,7 +192,7 @@ const getMapsPlacesLocation = async (
           await postDataToAppsScript(scriptUrl, dataGoogle, "dataFromGoogle");
         } else {
           let yelpDataFromSnippet;
-          let snippetFromRegYelp = await regexSnippet(link.snippet);
+          let snippetFromRegYelp = await regexSnippet(link.name);
           if (snippetFromRegYelp) {
             yelpDataFromSnippet = await regexSnippetYelpData(
               snippetFromRegYelp,
@@ -226,7 +230,7 @@ const getMapsPlacesLocation = async (
                       "",
                       results.website,
                       location,
-                      locationData.country,
+                      "",//locationData.country,
                       "",
                       "",
                       yelpMail
@@ -238,9 +242,9 @@ const getMapsPlacesLocation = async (
                     results.lastName,
                     addressFromYelp,
                     results.website,
-                    locationData.city,
-                    locationData.country,
-                    locationData.shortCode,
+                    "",//locationData.city,
+                    "",//locationData.country,
+                    "",//locationData.shortCode,
                     results.companyName,
                     yelpMail[0] //|| emailsToofrYelp[0]
                   );
@@ -280,5 +284,5 @@ function stripSpecalChar(str) {
 
 module.exports = {
   //postDataToAppsScript,
-  getMapsPlacesLocation
+  getBingData
 };

@@ -32,6 +32,7 @@ const getEmails = async (first_name, last_name, company_name) => {
     })
     .catch(function(error) {
       console.log(error.message);
+      return null;
     });
 };
 

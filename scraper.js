@@ -73,12 +73,12 @@ async function scrapeData(
         ? data.nextPage
             .toString()
             .split("&first=")[1]
-            .split("&FORM=PORE")[0]
+            .split("&FORM=")[0]
         : null;
       let oldCountNextPage = link
         .toString()
         .split("&first=")[1]
-        .split("&FORM=PORE")[0];
+        .split("&FORM=")[0];
       console.log(countNextPage, oldCountNextPage);
       if (
         data.nextPage !== "" &&
@@ -100,7 +100,7 @@ async function scrapeData(
         );
       } else {
         console.log("RESULTS", results);
-        console.log("RESULTS", results);
+        //console.log("RESULTS", results);
         await postDataToAppsScript(
           scriptUrl,
           results.length === 0 && newData.length ? newData : results,

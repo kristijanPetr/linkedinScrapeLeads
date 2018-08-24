@@ -41,9 +41,10 @@ async function getYelpData(data) {
     })
     .catch(e => {
       console.log(e);
+      return null;
     });
 }
 
- //getYelpData("Flynn Construction Austin Texas");
+//getYelpData("Flynn Construction Austin Texas");
 
 module.exports = { getLocationYelp: getPlacesYelp, getYelpData };

@@ -214,7 +214,7 @@ module.exports = {
         console.log("Company Found", result);
         return result;
       })
-      .catch(err => console.log("Find company err", err));
+      .catch(err => {});
   },
   findByUserAndCompany: (firstName, lastName, companyName) => {
     if (

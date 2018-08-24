@@ -71,7 +71,12 @@ async function scrapeData(
         .toString()
         .split("&first=")[1]
         .split("&FORM=")[0];
-      console.log(countNextPage, oldCountNextPage);
+      console.log(
+        "count next page",
+        countNextPage,
+        "old count next page",
+        oldCountNextPage
+      );
       if (
         data.nextPage !== "" &&
         parseInt(countNextPage) > parseInt(oldCountNextPage) &&

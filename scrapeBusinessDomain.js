@@ -32,7 +32,7 @@ function getYelpInfo(link) {
       //console.log(resp);
       return { firstName, lastName, website: resultWebsite };
     })
-    .catch(err => console.log(err.message));
+    .catch(err => {});
 }
 // getYelpInfo("https://www.yelp.com/biz/flynn-construction-austin");
 module.exports = { getYelpInfo };

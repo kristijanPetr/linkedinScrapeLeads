@@ -11,6 +11,8 @@ const { validateRawEmails } = require("./bulkEmailChecker");
 const { linkedinLeads } = require("./linkedinLeads");
 const { getMapsPlacesLocation } = require("./identifyLinkedin");
 const { getMapsPlacesLocationGoogle } = require("./indetifyGoogle");
+const { getBingData } = require("./identifyBingResults");
+const { bingSearchApi } = require("./bingSearchApi");
 
 // let RateLimit = require("express-rate-limit");
 const { queueRequests, getCityCountry } = require("./utils");
@@ -85,6 +87,13 @@ app.post("/identifyLinkedin", async (req, res) => {
   console.log(req.body);
   const { linkedinData, scriptUrl, vertical, inputLocation } = req.body;
   getMapsPlacesLocation(linkedinData, inputLocation, vertical, scriptUrl);
+  res.send({ msg: "success" });
+});
+
+app.post("/identifyBing", async (req, res) => {
+  //console.log(req.body);
+  const { linkedinData, scriptUrl, vertical, inputLocation } = req.body;
+  getBingData(linkedinData, inputLocation, vertical, scriptUrl);
   res.send({ msg: "success" });
 });
 
