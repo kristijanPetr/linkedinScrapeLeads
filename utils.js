@@ -125,7 +125,7 @@ const regexSnippet = async snippet => {
   }
 };
 
-// regexSnippet("View Karen Kilroy’s profile on LinkedIn, ... CEO at Kilroy Blockchain, LLC. Location Austin, Texas Area ... I am a hands-on full-stack Magento developer, ...");
+//regexSnippet("Mohamed Punjani - Founder and CEO - Bond Animal Health ...");
 
 const getCityCountry = locationString => {
   let arr = locationString.split(",").map(item => item.trim());

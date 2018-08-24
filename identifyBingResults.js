@@ -49,8 +49,8 @@ const getBingData = async (
 
     let location = link.location || `Location ${inputLocation}`;
 
-    console.log("LINKEDIN SNIPPET ", link.name);
-    let snippetFromReg = await regexSnippet(link.name);
+    console.log("LINKEDIN SNIPPET ", link.snippet);
+    let snippetFromReg = link.snippet.split("-")[3]//await regexSnippet(link.snippet);
     //console.log("LOCATION", inputLocation);
     //console.log("FIRST NAME ", splitted[0]);
     console.log("SNIPPET FROM REG", snippetFromReg);
@@ -144,7 +144,7 @@ const getBingData = async (
         await postDataToAppsScript(scriptUrl, dataGoogle, "dataFromGoogle");
       } else {
         let yelloPagesFromSnippet = await scraPeYellowPages(
-          link.name,
+          link.snippet,
           location,
           vertical
         );
@@ -192,12 +192,13 @@ const getBingData = async (
           await postDataToAppsScript(scriptUrl, dataGoogle, "dataFromGoogle");
         } else {
           let yelpDataFromSnippet;
-          let snippetFromRegYelp = await regexSnippet(link.name);
+          let snippetFromRegYelp = link.snippet.split("-")[3];//await regexSnippet(link.snippet);
           if (snippetFromRegYelp) {
-            yelpDataFromSnippet = await regexSnippetYelpData(
-              snippetFromRegYelp,
-              location
-            );
+             yelpDataFromSnippet = link.snippet.split("-")[3]
+            //await regexSnippetYelpData(
+            //   snippetFromRegYelp,
+            //   location
+            // );
           }
           console.log("YELP DATA FROM SNIPPET", yelpDataFromSnippet);
           let yelpMail;
