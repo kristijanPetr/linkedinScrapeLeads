@@ -13,7 +13,7 @@ const { getMapsPlacesLocation } = require("./identifyLinkedin");
 const { getMapsPlacesLocationGoogle } = require("./indetifyGoogle");
 const { getBingData } = require("./identifyBingResults");
 const { bingSearchApi } = require("./bingSearchApi");
-
+const { getEmailsFromToofr } = require("./getEmailsFromToofr");
 // let RateLimit = require("express-rate-limit");
 const { queueRequests, getCityCountry } = require("./utils");
 // const { scraPeYellowPages } = require("./scrapeYellowPages");
@@ -100,6 +100,12 @@ app.post("/identifyBing", async (req, res) => {
 app.post("/identifyGoogle", async (req, res) => {
   const { googleData, scriptUrl, vertical } = req.body;
   getMapsPlacesLocationGoogle(googleData, vertical, scriptUrl);
+  res.send({ msg: "success" });
+});
+
+app.post("/getEmailsToofr", async (req, res) => {
+  const { googleData, scriptUrl } = req.body;
+  getEmailsFromToofr(googleData, scriptUrl);
   res.send({ msg: "success" });
 });
 

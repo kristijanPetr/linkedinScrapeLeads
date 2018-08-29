@@ -42,7 +42,7 @@ const getBingData = async (
       : { location: "" };
     console.log("LINK NAME", link.name);
 
-    let splitted = link.name.split("-");
+    let splitted = link.name.split(" ");
     // let splitted = stripSpecalChar(link.name)
     //   .split(" ")
     //   .filter(item => item.length > 2);
@@ -52,7 +52,7 @@ const getBingData = async (
     let location = link.location || `Location ${inputLocation}`;
 
     console.log("LINKEDIN SNIPPET ", link.snippet);
-    let snippetFromReg = link.snippet.split("-")[3]; //await regexSnippet(link.snippet);
+    let snippetFromReg = link.snippet.split("-")[2]; //await regexSnippet(link.snippet);
     //console.log("LOCATION", inputLocation);
     //console.log("FIRST NAME ", splitted[0]);
     console.log("SNIPPET FROM REG", snippetFromReg);
@@ -81,13 +81,15 @@ const getBingData = async (
       //let dbCompanyArr = [];
       let emailCrawledDb =
         (await scrapeEmailFromDomain(companyFromDb.website)) || [];
+      let firstnameDB = companyFromDb.firstName.split(" ");
+      
       dataGoogle.push([
-        companyFromDb.firstName || splitted[0],
+        firstnameDB[0] || splitted[0],
         companyFromDb.lastName || splitted[1],
         vertical,
         companyFromDb.companyName || "",
         companyFromDb.website || "",
-        location,
+        (location = typeof location === "undefined" ? "" : location),
         locationData.country,
         "",
         companyFromDb.address || "",
@@ -122,7 +124,7 @@ const getBingData = async (
             splitted[0],
             splitted[1],
             vertical,
-            "",
+            snippetFromReg,
             dataFromGoogle[1],
             location,
             locationData.country,
@@ -194,9 +196,9 @@ const getBingData = async (
           await postDataToAppsScript(scriptUrl, dataGoogle, "dataFromGoogle");
         } else {
           let yelpDataFromSnippet;
-          let snippetFromRegYelp = link.snippet.split("-")[3]; //await regexSnippet(link.snippet);
+          let snippetFromRegYelp = link.snippet.split("-")[2]; //await regexSnippet(link.snippet);
           if (snippetFromRegYelp) {
-            yelpDataFromSnippet = link.snippet.split("-")[3];
+            yelpDataFromSnippet = link.snippet.split("-")[2];
             //await regexSnippetYelpData(
             //   snippetFromRegYelp,
             //   location
@@ -230,7 +232,7 @@ const getBingData = async (
                       results.firstName,
                       results.lastName,
                       vertical,
-                      "",
+                      yelpDataFromSnippet,
                       results.website,
                       location,
                       "", //locationData.country,

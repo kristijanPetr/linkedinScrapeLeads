@@ -75,6 +75,7 @@ const getMapsPlacesLocation = async (
       //let dbCompanyArr = [];
       let emailCrawledDb =
         (await scrapeEmailFromDomain(companyFromDb.website)) || [];
+
       dataGoogle.push([
         companyFromDb.firstName || splitted[0],
         companyFromDb.lastName || splitted[1],

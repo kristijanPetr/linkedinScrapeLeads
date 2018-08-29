@@ -17,7 +17,7 @@ const findCompany = companyNameQuery => {
           listItem: "cite"
         }
       });
-      // console.log(data);
+      //console.log(data);
       return [data.address || "", data.website[0] || ""];
     })
     .catch(err => ["", ""]);
@@ -25,4 +25,4 @@ const findCompany = companyNameQuery => {
 
 module.exports.findCompanyGoogle = findCompany;
 
-// findCompany("ExchangeReactions  Stware Developer  GM Location: Austin, Texas");
+//findCompany("ExchangeReactions  Stware Developer  GM Location: Austin, Texas");
