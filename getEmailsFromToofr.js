@@ -10,9 +10,12 @@ const getEmails = async (googleData, scriptUrl) => {
   // if (!first_name || !last_name || !company_name) {
   //   return "";
   // }
-  let dataGoogle = [];
+ 
   for (let index = 0; index < googleData.length; index++) {
+    let dataGoogle = [];
     const el = googleData[index];
+    console.log("INDEX", index, el);
+
     dataGoogle.push(
       el.firstName,
       el.lastName,
@@ -24,9 +27,8 @@ const getEmails = async (googleData, scriptUrl) => {
       el.url,
       el.address
     );
-   
 
-    return axios
+    await axios
       .post(url, {
         first_name: el.firstName,
         last_name: el.lastName,
