@@ -37,7 +37,9 @@ const getBingData = async (
     let uncheckedData = [];
     // console.log("LINK LOCATION", inputLocation);
 
-    let locationData; //= getCityCountry(inputLocation);
+    let locationData = inputLocation
+      ? getCityCountry(inputLocation)
+      : { location: "" };
     console.log("LINK NAME", link.name);
 
     let splitted = link.name.split("-");
@@ -50,7 +52,7 @@ const getBingData = async (
     let location = link.location || `Location ${inputLocation}`;
 
     console.log("LINKEDIN SNIPPET ", link.snippet);
-    let snippetFromReg = link.snippet.split("-")[3]//await regexSnippet(link.snippet);
+    let snippetFromReg = link.snippet.split("-")[3]; //await regexSnippet(link.snippet);
     //console.log("LOCATION", inputLocation);
     //console.log("FIRST NAME ", splitted[0]);
     console.log("SNIPPET FROM REG", snippetFromReg);
@@ -126,7 +128,7 @@ const getBingData = async (
             locationData.country,
             "",
             "",
-            emailCrawled[0]
+            emailCrawled
           ]);
           Company.updateOrInsertCompany(
             splitted[0],
@@ -137,7 +139,7 @@ const getBingData = async (
             locationData.country,
             locationData.shortCode,
             snippetFromReg,
-            emailCrawled[0]
+            emailCrawled
           );
         }
         console.log("DATA GOOGLE", dataGoogle);
@@ -166,7 +168,7 @@ const getBingData = async (
               yelloPagesFromSnippet.companyInfo.title,
               yelloPagesFromSnippet.companyInfo.website,
               location,
-              "",//locationData.country,
+              "", //locationData.country,
               yelloPagesFromSnippet.companyInfo.link,
               yelloPagesFromSnippet.companyInfo.address,
               yelloPagesFromSnippet.email
@@ -180,9 +182,9 @@ const getBingData = async (
             splitted[1],
             yelloPagesFromSnippet.companyInfo.address,
             yelloPagesFromSnippet.companyInfo.website,
-            "",//locationData.city,
-            "",//locationData.country,
-            "",//locationData.shortCode,
+            "", //locationData.city,
+            "", //locationData.country,
+            "", //locationData.shortCode,
             yelloPagesFromSnippet.companyInfo.title,
             yelloPagesFromSnippet.email
           );
@@ -192,9 +194,9 @@ const getBingData = async (
           await postDataToAppsScript(scriptUrl, dataGoogle, "dataFromGoogle");
         } else {
           let yelpDataFromSnippet;
-          let snippetFromRegYelp = link.snippet.split("-")[3];//await regexSnippet(link.snippet);
+          let snippetFromRegYelp = link.snippet.split("-")[3]; //await regexSnippet(link.snippet);
           if (snippetFromRegYelp) {
-             yelpDataFromSnippet = link.snippet.split("-")[3]
+            yelpDataFromSnippet = link.snippet.split("-")[3];
             //await regexSnippetYelpData(
             //   snippetFromRegYelp,
             //   location
@@ -231,7 +233,7 @@ const getBingData = async (
                       "",
                       results.website,
                       location,
-                      "",//locationData.country,
+                      "", //locationData.country,
                       "",
                       "",
                       yelpMail
@@ -243,9 +245,9 @@ const getBingData = async (
                     results.lastName,
                     addressFromYelp,
                     results.website,
-                    "",//locationData.city,
-                    "",//locationData.country,
-                    "",//locationData.shortCode,
+                    "", //locationData.city,
+                    "", //locationData.country,
+                    "", //locationData.shortCode,
                     results.companyName,
                     yelpMail[0] //|| emailsToofrYelp[0]
                   );
