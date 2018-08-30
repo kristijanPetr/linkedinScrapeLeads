@@ -19,6 +19,7 @@ const { queueRequests, getCityCountry } = require("./utils");
 // const { scraPeYellowPages } = require("./scrapeYellowPages");
 const { pickProxiesIp } = require("./proxies");
 const mongoose = require("mongoose");
+const { scrapeLinkedinUrl } = require("./scrapeLinkedinUrlBingApi");
 
 mongoose.Promise = global.Promise;
 mongoose.connect(
@@ -71,7 +72,7 @@ app.post("/linkedinScrape", async (req, res) => {
   const { query, vertical, location, scriptUrl, count } = req.body;
   let link = `http://www.bing.com/search?q=${query}&qs=n&first=0`;
   console.log("query", query, "whole link query", link);
-  let proxyIp = "54.88.23.69:80";//await pickProxiesIp();
+  let proxyIp = "54.88.23.69:80"; //await pickProxiesIp();
   let results = await linkedinLeads(
     link,
     [],
@@ -109,6 +110,21 @@ app.post("/identifyGoogle", async (req, res) => {
 app.post("/getEmailsToofr", async (req, res) => {
   const { googleData, scriptUrl } = req.body;
   getEmailsFromToofr(googleData, scriptUrl);
+  res.send({ msg: "success" });
+});
+
+app.post("/scrapeLinkedinUrl", async (req, res) => {
+  const { urls, scriptUrl } = req.body;
+
+
+  let arr = urls.map(el => el.profileUrl);
+  //  console.log(urls);
+ 
+  let proxyIp = "54.88.23.69:80";
+  let link = [];
+  let formattedUrls = arr.map(item => `http://www.bing.com/search?q=${item}&qs=n&first=0`)
+ 
+  let results = await scrapeLinkedinUrl(formattedUrls, [], scriptUrl, proxyIp);
   res.send({ msg: "success" });
 });
 
