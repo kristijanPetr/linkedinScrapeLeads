@@ -35,19 +35,19 @@ const axiosProxyRequest = url => {
   });
 };
 
-// const axiosProxyRequest1 = url => {
-//   return axios.get(url, {
-//     proxy: {
-//       host:
-//         "http://zproxy.lum-superproxy.io",
-//       port: 22225,
-//       auth: {
-//         username: "lum-customer-hl_030a86e4-zone-static",
-//         password: "ueyv97j2vmup"
-//       }
-//     }
-//   });
-// };
+const axiosProxyRequest1 = (proxyIp, url) => {
+  return axios.get(url, {
+    proxy: {
+      host: proxyIp.split(":")[0],
+      port: proxyIp.split(":")[1]
+      // auth: {
+      //   username: "lum-customer-hl_030a86e4-zone-static",
+      //   password: "ueyv97j2vmup"
+      // }
+    }
+  });
+};
+
 // axiosProxyRequest1(
 //   "http://www.bing.com/search?q=site%3Alinkedin.com+intitle%3ACOO+AND+inbody%3Achiropractor+Texas&qs=n&form=QBLH&sp=-1&pq=site%3Alinkedin.com+intitle%3Acoo+and+inbody%3Achiropractor+texas&sc=0-59&sk=&cvid=E9A3AD83A3724162B1F38CA156D1A81A"
 // ).then(res => console.log(res));
@@ -62,6 +62,7 @@ const postDataToAppsScript = async (
   return axios
     .post(scriptUrl, objData)
     .then(resp => {
+      //console.log("DATA TO APP SCRIPT", resp);
       return resp.data;
     })
     .catch(err => {});
@@ -162,7 +163,8 @@ module.exports = {
   emptyTextDataFile,
   regexSnippet,
   getCityCountry,
-  extractDomainFromUrl
+  extractDomainFromUrl,
+  axiosProxyRequest1
 };
 
 //console.log(textDataToArray())

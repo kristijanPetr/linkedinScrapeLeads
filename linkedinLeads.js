@@ -1,6 +1,6 @@
 const scrapeIt = require("scrape-it");
 const { postDataToAppsScript } = require("./utils");
-const { axiosProxyRequest } = require("./utils");
+const { axiosProxyRequest, axiosProxyRequest1 } = require("./utils");
 
 // Promise interface
 async function scrapeData(
@@ -13,7 +13,7 @@ async function scrapeData(
   proxyIp,
   userStartTime
 ) {
-  return await axiosProxyRequest(link)
+  return await axiosProxyRequest1(proxyIp, link)
     .then(async resp => {
       let html = resp.data;
       let data = scrapeIt.scrapeHTML(html, {

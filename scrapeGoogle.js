@@ -25,4 +25,4 @@ const findCompany = companyNameQuery => {
 
 module.exports.findCompanyGoogle = findCompany;
 
-//findCompany("ExchangeReactions  Stware Developer  GM Location: Austin, Texas");
+//findCompany("markham 7 dental");

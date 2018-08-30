@@ -17,6 +17,7 @@ const { getEmailsFromToofr } = require("./getEmailsFromToofr");
 // let RateLimit = require("express-rate-limit");
 const { queueRequests, getCityCountry } = require("./utils");
 // const { scraPeYellowPages } = require("./scrapeYellowPages");
+const { pickProxiesIp } = require("./proxies");
 const mongoose = require("mongoose");
 
 mongoose.Promise = global.Promise;
@@ -70,6 +71,7 @@ app.post("/linkedinScrape", async (req, res) => {
   const { query, vertical, location, scriptUrl, count } = req.body;
   let link = `http://www.bing.com/search?q=${query}&qs=n&first=0`;
   console.log("query", query, "whole link query", link);
+  let proxyIp = "54.88.23.69:80";//await pickProxiesIp();
   let results = await linkedinLeads(
     link,
     [],
@@ -77,7 +79,8 @@ app.post("/linkedinScrape", async (req, res) => {
     vertical,
     count,
     scriptUrl,
-    proxyIp.ip
+    proxyIp
+    // proxyIp.ip
   );
 
   res.send({ msg: "success", link });

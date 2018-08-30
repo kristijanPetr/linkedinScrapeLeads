@@ -10,11 +10,11 @@ const getEmails = async (googleData, scriptUrl) => {
   // if (!first_name || !last_name || !company_name) {
   //   return "";
   // }
- 
+
   for (let index = 0; index < googleData.length; index++) {
     let dataGoogle = [];
     const el = googleData[index];
-    console.log("INDEX", index, el);
+    //console.log("INDEX", index, el);
 
     dataGoogle.push(
       el.firstName,
@@ -43,7 +43,7 @@ const getEmails = async (googleData, scriptUrl) => {
         data.forEach(element => {
           dataGoogle.push(element.confidence, element.email);
         });
-        console.log(dataGoogle);
+        console.log("DATA GOOGLE", [dataGoogle]);
         postDataToAppsScript(scriptUrl, [dataGoogle], "emailsToofr");
         return dataGoogle;
 
@@ -56,6 +56,6 @@ const getEmails = async (googleData, scriptUrl) => {
   }
 };
 
-//getEmails("Travis", "Benton", "http://www.gspawn.com/");
+//getEmails("Travis", "Benton", "mydomain");
 
 module.exports.getEmailsFromToofr = getEmails;

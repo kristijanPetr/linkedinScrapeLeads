@@ -68,6 +68,9 @@ async function pickProxiesIp() {
 
 module.exports.pickProxiesIp = pickProxiesIp;
 
+// const proxylist = require("proxylist");
+// proxylist.main().then(resp => console.log(resp));
+// pickProxiesIp().then(resp => console.log(resp))
 let proxies = [
   "120.138.102.45:8080",
   "185.203.252.121:41258",
