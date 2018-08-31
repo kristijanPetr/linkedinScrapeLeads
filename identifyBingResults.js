@@ -69,7 +69,7 @@ const getBingData = async (
 
     //console.log("COMPANY FROM DB", companyFromDb);
 
-    if (companyFromDb) {
+    if (companyFromDb && companyFromDb.website != "") {
       // let emailFromToofDB = await getEmailsFromToofr(
       //   companyFromDb.firstName || splitted[0],
       //   companyFromDb.lastName || splitted[1],
@@ -82,7 +82,7 @@ const getBingData = async (
       let emailCrawledDb =
         (await scrapeEmailFromDomain(companyFromDb.website)) || [];
       let firstnameDB = companyFromDb.firstName.split(" ");
-      
+
       dataGoogle.push([
         firstnameDB[0] || splitted[0],
         companyFromDb.lastName || splitted[1],

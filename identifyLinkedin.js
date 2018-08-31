@@ -63,7 +63,7 @@ const getMapsPlacesLocation = async (
 
     //console.log("COMPANY FROM DB", companyFromDb);
 
-    if (companyFromDb) {
+    if (companyFromDb && companyFromDb.website != "") {
       // let emailFromToofDB = await getEmailsFromToofr(
       //   companyFromDb.firstName || splitted[0],
       //   companyFromDb.lastName || splitted[1],
@@ -81,7 +81,7 @@ const getMapsPlacesLocation = async (
         companyFromDb.lastName || splitted[1],
         vertical,
         companyFromDb.companyName || "",
-        companyFromDb.website || "",
+        companyFromDb.website,
         location,
         locationData.country,
         "",

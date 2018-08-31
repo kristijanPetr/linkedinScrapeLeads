@@ -129,21 +129,24 @@ const regexSnippet = async snippet => {
 //regexSnippet("Mohamed Punjani - Founder and CEO - Bond Animal Health ...");
 
 const getCityCountry = locationString => {
-  let arr = locationString.split(",").map(item => item.trim());
-  let foundCountry = arr.filter(item => countryMapper[item]);
-  //console.log(foundCountry);
-  let indexCountry = arr.indexOf(foundCountry[0]);
-  let city =
-    (indexCountry > -1 ? (indexCountry === 1 ? arr[0] : arr[1]) : "") || "";
-  console.log({
-    country: foundCountry[0],
-    city
-  });
-  return {
-    country: foundCountry[0],
-    city,
-    shortCode: countryMapper[foundCountry[0]] || ""
-  };
+  if (locationString) {
+    let arr = locationString.split(",").map(item => item.trim());
+    let foundCountry = arr.filter(item => countryMapper[item]);
+    //console.log(foundCountry);
+    let indexCountry = arr.indexOf(foundCountry[0]);
+    let city =
+      (indexCountry > -1 ? (indexCountry === 1 ? arr[0] : arr[1]) : "") || "";
+    console.log({
+      country: foundCountry[0],
+      city
+    });
+
+    return {
+      country: foundCountry[0] || "",
+      city,
+      shortCode: countryMapper[foundCountry[0]] || ""
+    };
+  }
 };
 
 const extractDomainFromUrl = url => {
