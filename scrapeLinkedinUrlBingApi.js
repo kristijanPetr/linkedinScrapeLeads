@@ -51,7 +51,7 @@ async function scrapeData(
         }
       });
 
-      // console.log(data);
+      console.log("data from profile url", data);
       if (data.articles) {
         linkedinFetchedResults.push(data.articles[0]);
       }

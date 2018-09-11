@@ -72,7 +72,7 @@ app.post("/linkedinScrape", async (req, res) => {
   const { query, vertical, location, scriptUrl, count } = req.body;
   let link = `http://www.bing.com/search?q=${query}&qs=n&first=0`;
   console.log("query", query, "whole link query", link);
-  let proxyIp = "216.246.132.57"; //await pickProxiesIp();
+  let proxyIp = "95.216.86.195:443"; //await pickProxiesIp();
   let results = await linkedinLeads(
     link,
     [],
@@ -116,14 +116,15 @@ app.post("/getEmailsToofr", async (req, res) => {
 app.post("/scrapeLinkedinUrl", async (req, res) => {
   const { urls, scriptUrl } = req.body;
 
-
   let arr = urls.map(el => el.profileUrl);
   //  console.log(urls);
- 
-  let proxyIp = "216.246.132.57";
+
+  let proxyIp = "95.216.86.195:443";
   let link = [];
-  let formattedUrls = arr.map(item => `http://www.bing.com/search?q=${item}&qs=n&first=0`)
- 
+  let formattedUrls = arr.map(
+    item => `http://www.bing.com/search?q=${item}&qs=n&first=0`
+  );
+
   let results = await scrapeLinkedinUrl(formattedUrls, [], scriptUrl, proxyIp);
   res.send({ msg: "success" });
 });
